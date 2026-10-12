@@ -1,0 +1,5 @@
+# Remplacez la fin de votre pubspec.yaml par ceci :
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/geo/africa_50m.json

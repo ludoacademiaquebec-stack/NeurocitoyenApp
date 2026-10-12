@@ -16,6 +16,7 @@ import 'features/forum/forum_screen.dart';
 import 'features/banque/banque_screen.dart';
 import 'features/coop/coop_screen.dart';
 import 'features/profil/profil_screen.dart';
+import 'features/poles/poles_screen.dart';
 
 Future<bool> _isLoggedIn() async {
   var p=await SharedPreferences.getInstance();
@@ -25,8 +26,10 @@ Future<bool> _isLoggedIn() async {
 final router = GoRouter(
   initialLocation: '/',
   redirect: (context, state) async {
-    var publicRoutes=['/','/carte','/inscription','/charte','/modele-eco','/ia-guide'];
-    var isPublic=publicRoutes.any((r)=> state.matchedLocation.startsWith(r));
+    // CORRECTION : '/' n'est plus testé par startsWith (il rendait TOUTES les routes publiques).
+    var publicRoutes=['/carte','/inscription','/charte','/modele-eco','/ia-guide','/poles'];
+    var loc=state.matchedLocation;
+    var isPublic=loc=='/' || publicRoutes.any((r)=> loc.startsWith(r));
     if(isPublic) return null;
     var logged=await _isLoggedIn();
     if(!logged){
@@ -50,6 +53,7 @@ final router = GoRouter(
     GoRoute(path: '/banque', builder: (c,s)=> const BanqueScreen()),
     GoRoute(path: '/coop', builder: (c,s)=> const CoopScreen()),
     GoRoute(path: '/profil', builder: (c,s)=> const ProfilScreen()),
+    GoRoute(path: '/poles', builder: (c,s)=> const PolesScreen()),
   ]
 );
 
