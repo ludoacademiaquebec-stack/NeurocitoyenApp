@@ -16,3 +16,10 @@ lib_backup_avant_nettoyage/
 # macOS
 .DS_Store
 .env*
+
+# macOS
+.DS_Store
+
+# Flutter
+build/
+.dart_tool/
