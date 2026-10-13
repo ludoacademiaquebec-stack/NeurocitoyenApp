@@ -70,9 +70,10 @@ class _LandingScreenState extends State<LandingScreen> {
         backgroundColor: const Color(0xFF080C1F),
         title: Row(children: [
           Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(color: Colors.white10, borderRadius: BorderRadius.circular(10)),
-              child: const Text('🧠', style: TextStyle(fontSize: 20))),
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(color: Colors.white10, borderRadius: BorderRadius.circular(10)),
+            child: Image.asset('assets/logo_ligue.jpg', width: 28, height: 28, fit: BoxFit.contain),
+          ),
           const SizedBox(width: 10),
           Text(L10n.t('ligue'), style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.white70)),
         ]),
@@ -101,22 +102,26 @@ class _LandingScreenState extends State<LandingScreen> {
             ListTile(leading: const Icon(Icons.school, color: Colors.white70), title: const Text('Modules', style: TextStyle(color: Colors.white70)), onTap: () => context.go('/modules')),
             ListTile(leading: const Icon(Icons.cast_for_education, color: Colors.white70), title: const Text('Universite', style: TextStyle(color: Colors.white70)), onTap: () => context.go('/universite')),
           ])),
-      bottomNavigationBar: BottomNavigationBar(
-          backgroundColor: const Color(0xFF101845),
-          selectedItemColor: const Color(0xFFFFC400),
-          unselectedItemColor: Colors.white54,
-          type: BottomNavigationBarType.fixed,
-          onTap: (i) {
-            var routes = ['/', '/carte', '/dashboard', '/modules', '/profil'];
-            context.go(routes[i]);
-          },
-          items: const [
-            BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Accueil'),
-            BottomNavigationBarItem(icon: Icon(Icons.map), label: 'Cites'),
-            BottomNavigationBarItem(icon: Icon(Icons.dashboard), label: 'Board'),
-            BottomNavigationBarItem(icon: Icon(Icons.school), label: 'Modules'),
-            BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profil'),
-          ]),
+      bottomNavigationBar: SafeArea(
+        child: Container(
+          height: 70 + MediaQuery.of(context).padding.bottom,
+          color: const Color(0xFF101845),
+          child: BottomNavigationBar(
+            backgroundColor: const Color(0xFF101845),
+            selectedItemColor: const Color(0xFFFFC400),
+            unselectedItemColor: Colors.white54,
+            type: BottomNavigationBarType.fixed,
+            onTap: (i) => context.go(['/', '/carte', '/dashboard', '/modules', '/profil'][i]),
+            items: const [
+              BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Accueil'),
+              BottomNavigationBarItem(icon: Icon(Icons.map), label: 'Cités'),
+              BottomNavigationBarItem(icon: Icon(Icons.dashboard), label: 'Board'),
+              BottomNavigationBarItem(icon: Icon(Icons.school), label: 'Modules'),
+              BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profil'),
+            ],
+          ),
+        ),
+      ),
       body: ListView(
         children: const [
           _Hero(),
@@ -128,11 +133,14 @@ class _LandingScreenState extends State<LandingScreen> {
           _Footer(),
         ],
       ),
-      floatingActionButton: FloatingActionButton.extended(
-          onPressed: () => context.go('/ia-guide'),
-          backgroundColor: const Color(0xFFFFC400),
-          icon: const Icon(Icons.smart_toy, color: Colors.black),
-          label: const Text('IA Guide', style: TextStyle(color: Colors.black, fontSize: 11))),
+      floatingActionButton: Padding(
+        padding: EdgeInsets.only(bottom: 90 + MediaQuery.of(context).viewPadding.bottom),
+        child: FloatingActionButton.extended(
+            onPressed: () => context.go('/ia-guide'),
+            backgroundColor: const Color(0xFFFFC400),
+            icon: const Icon(Icons.smart_toy, color: Colors.black),
+            label: const Text('IA Guide', style: TextStyle(color: Colors.black, fontSize: 11))),
+      ),
     );
   }
 }
@@ -318,10 +326,10 @@ class _HeroState extends State<_Hero> {
     return Container(
       padding: const EdgeInsets.fromLTRB(16, 14, 16, 16),
       decoration: BoxDecoration(
-        color: _C.nuit3.withOpacity(0.9),
+        color: _C.nuit3.withValues(alpha: 0.9),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: _C.or.withOpacity(0.5)),
-        boxShadow: [BoxShadow(color: _C.or.withOpacity(0.15), blurRadius: 40)],
+        border: Border.all(color: _C.or.withValues(alpha: 0.5)),
+        boxShadow: [BoxShadow(color: _C.or.withValues(alpha: 0.15), blurRadius: 40)],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -370,7 +378,7 @@ class _HeroState extends State<_Hero> {
       onSelected: (_) => setState(() => _region = selected ? null : code),
       selectedColor: color,
       backgroundColor: Colors.white10,
-      side: BorderSide(color: color.withOpacity(0.7)),
+      side: BorderSide(color: color.withValues(alpha: 0.7)),
       labelStyle: TextStyle(
         color: selected ? Colors.white : Colors.white70,
         fontSize: 12,
@@ -390,7 +398,7 @@ class _EmblemPainter extends CustomPainter {
     final r = size.width / 2;
     canvas.drawCircle(c, r - 2, Paint()..color = _C.nuit3);
     canvas.drawCircle(c, r - 2, Paint()..style = PaintingStyle.stroke..strokeWidth = 2.5..color = _C.or);
-    canvas.drawCircle(c, r * 0.8, Paint()..style = PaintingStyle.stroke..strokeWidth = 0.8..color = _C.or.withOpacity(0.6));
+    canvas.drawCircle(c, r * 0.8, Paint()..style = PaintingStyle.stroke..strokeWidth = 0.8..color = _C.or.withValues(alpha: 0.6));
     canvas.drawCircle(c, r * 0.5, Paint()..style = PaintingStyle.stroke..strokeWidth = 1..color = _C.orClair);
     final star = Path();
     for (var i = 0; i < 10; i++) {
@@ -599,9 +607,9 @@ class _Cooperative extends StatelessWidget {
             width: double.infinity,
             padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
-              color: _C.or.withOpacity(0.12),
+              color: _C.or.withValues(alpha: 0.12),
               borderRadius: BorderRadius.circular(14),
-              border: Border.all(color: _C.or.withOpacity(0.5)),
+              border: Border.all(color: _C.or.withValues(alpha: 0.5)),
             ),
             child: const Text(
               'Entrée sans barrière : une première étape gratuite, un paiement fractionné par mobile money, '
@@ -640,7 +648,7 @@ class _Pillar extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(22),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.06),
+        color: Colors.white.withValues(alpha: 0.06),
         borderRadius: BorderRadius.circular(14),
         border: Border.all(color: Colors.white12),
       ),
@@ -673,8 +681,8 @@ class _Diaspora extends StatelessWidget {
         padding: const EdgeInsets.all(24),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: _C.or.withOpacity(0.5)),
-          gradient: LinearGradient(colors: [_C.or.withOpacity(0.10), Colors.transparent]),
+          border: Border.all(color: _C.or.withValues(alpha: 0.5)),
+          gradient: LinearGradient(colors: [_C.or.withValues(alpha: 0.10), Colors.transparent]),
         ),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
