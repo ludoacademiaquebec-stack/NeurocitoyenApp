@@ -174,7 +174,7 @@ class _MapPainter extends CustomPainter {
       final base = kRegions[c.region]!.color;
       final dim = region!= null && c.region!= region;
       final isSel = c.id == selected;
-      fill.color = base.withValues(alpha: isSel? 0.95 : (dim? 0.12 : 0.58));
+     fill.color = base.withOpacity(isSel? 0.95 : (dim? 0.12 : 0.58));
       canvas.drawPath(c.path, fill); canvas.drawPath(c.path, border);
     }
     if (selected!= null) {
