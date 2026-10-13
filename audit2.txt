@@ -1,0 +1,283 @@
+===== A. MAIN.DART (40 premières lignes) =====
+import 'package:flutter/material.dart';
+import 'app.dart';
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  runApp(const App());
+}
+===== B. APP.DART =====
+import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'features/home/landing_screen.dart';
+import 'features/panafricain/carte_afrique_screen.dart';
+import 'features/auth/inscription_v2_screen.dart';
+import 'features/admin/admin_screen.dart';
+import 'features/modules/modules_screen.dart';
+import 'features/ia/ia_enseignant_screen.dart';
+import 'features/dashboard/dashboard_screen.dart';
+import 'features/ia/ia_guide_global.dart';
+import 'features/universite/universite_screen.dart';
+import 'features/charte/charte_screen.dart';
+import 'features/charte/modele_eco_screen.dart';
+import 'features/forum/forum_screen.dart';
+import 'features/banque/banque_screen.dart';
+import 'features/coop/coop_screen.dart';
+import 'features/profil/profil_screen.dart';
+import 'features/poles/poles_screen.dart';
+
+Future<bool> _isLoggedIn() async {
+  var p=await SharedPreferences.getInstance();
+  return p.getString('code_parrain')!=null;
+}
+
+final router = GoRouter(
+  initialLocation: '/',
+  redirect: (context, state) async {
+    // CORRECTION : '/' n'est plus testé par startsWith (il rendait TOUTES les routes publiques).
+    var publicRoutes=['/carte','/inscription','/charte','/modele-eco','/ia-guide','/poles'];
+    var loc=state.matchedLocation;
+    var isPublic=loc=='/' || publicRoutes.any((r)=> loc.startsWith(r));
+    if(isPublic) return null;
+    var logged=await _isLoggedIn();
+    if(!logged){
+      return '/inscription?pays=BJ&redirect=' + Uri.encodeComponent(state.matchedLocation);
+    }
+    return null;
+  },
+  routes: [
+    GoRoute(path: '/', builder: (c,s)=> const LandingScreen()),
+    GoRoute(path: '/carte', builder: (c,s)=> const CarteAfriqueScreen()),
+    GoRoute(path: '/inscription', builder: (c,s){ final p = s.uri.queryParameters['pays'] ?? 'BJ'; return InscriptionScreen(paysId: p); }),
+    GoRoute(path: '/admin', builder: (c,s)=> const AdminScreen()),
+    GoRoute(path: '/modules', builder: (c,s)=> const ModulesScreen()),
+    GoRoute(path: '/module/:id', builder: (c,s){ final id = int.tryParse(s.pathParameters['id']??'1')??1; return IAEnseignantScreen(moduleId: id); }),
+    GoRoute(path: '/dashboard', builder: (c,s)=> const DashboardScreen()),
+    GoRoute(path: '/ia-guide', builder: (c,s)=> const IAGuideGlobal()),
+    GoRoute(path: '/universite', builder: (c,s)=> const UniversiteScreen()),
+    GoRoute(path: '/charte', builder: (c,s)=> const CharteScreen()),
+    GoRoute(path: '/modele-eco', builder: (c,s)=> const ModeleEcoScreen()),
+    GoRoute(path: '/forum', builder: (c,s)=> const ForumScreen()),
+    GoRoute(path: '/banque', builder: (c,s)=> const BanqueScreen()),
+    GoRoute(path: '/coop', builder: (c,s)=> const CoopScreen()),
+    GoRoute(path: '/profil', builder: (c,s)=> const ProfilScreen()),
+    GoRoute(path: '/poles', builder: (c,s)=> const PolesScreen()),
+  ]
+);
+
+class App extends StatelessWidget { const App({super.key}); @override Widget build(BuildContext context)=> MaterialApp.router(routerConfig: router, theme: ThemeData(scaffoldBackgroundColor: const Color(0xFF080C1F), useMaterial3: true), debugShowCheckedModeBanner: false); }
+
+===== C. ROUTER / ROUTES =====
+lib/app.dart:41:    GoRoute(path: '/', builder: (c,s)=> const LandingScreen()),
+lib/app.dart:42:    GoRoute(path: '/carte', builder: (c,s)=> const CarteAfriqueScreen()),
+lib/app.dart:43:    GoRoute(path: '/inscription', builder: (c,s){ final p = s.uri.queryParameters['pays'] ?? 'BJ'; return InscriptionScreen(paysId: p); }),
+lib/app.dart:44:    GoRoute(path: '/admin', builder: (c,s)=> const AdminScreen()),
+lib/app.dart:45:    GoRoute(path: '/modules', builder: (c,s)=> const ModulesScreen()),
+lib/app.dart:46:    GoRoute(path: '/module/:id', builder: (c,s){ final id = int.tryParse(s.pathParameters['id']??'1')??1; return IAEnseignantScreen(moduleId: id); }),
+lib/app.dart:47:    GoRoute(path: '/dashboard', builder: (c,s)=> const DashboardScreen()),
+lib/app.dart:48:    GoRoute(path: '/ia-guide', builder: (c,s)=> const IAGuideGlobal()),
+lib/app.dart:49:    GoRoute(path: '/universite', builder: (c,s)=> const UniversiteScreen()),
+lib/app.dart:50:    GoRoute(path: '/charte', builder: (c,s)=> const CharteScreen()),
+lib/app.dart:51:    GoRoute(path: '/modele-eco', builder: (c,s)=> const ModeleEcoScreen()),
+lib/app.dart:52:    GoRoute(path: '/forum', builder: (c,s)=> const ForumScreen()),
+lib/app.dart:53:    GoRoute(path: '/banque', builder: (c,s)=> const BanqueScreen()),
+lib/app.dart:54:    GoRoute(path: '/coop', builder: (c,s)=> const CoopScreen()),
+lib/app.dart:55:    GoRoute(path: '/profil', builder: (c,s)=> const ProfilScreen()),
+lib/app.dart:56:    GoRoute(path: '/poles', builder: (c,s)=> const PolesScreen()),
+lib/widgets/africa_map.dart:72:        centroid: Offset((c[0] as num).toDouble(), (c[1] as num).toDouble()), path: path));
+
+===== D. HOME vs LANDING — qui est utilisé ? =====
+lib/features/home/home_screen.dart:4:class HomeScreen extends StatelessWidget{
+lib/features/home/home_screen.dart:5:  const HomeScreen({super.key});
+lib/features/home/landing_screen.dart:41:class LandingScreen extends StatefulWidget {
+lib/features/home/landing_screen.dart:42:  const LandingScreen({super.key});
+lib/features/home/landing_screen.dart:44:  State<LandingScreen> createState() => _LandingScreenState();
+lib/features/home/landing_screen.dart:47:class _LandingScreenState extends State<LandingScreen> {
+lib/app.dart:41:    GoRoute(path: '/', builder: (c,s)=> const LandingScreen()),
+
+===== E. SUPABASE CONFIG =====
+// lib/core/supabase_config.dart
+// ⚠️ NE PAS COMMIT AVEC LES VRAIES CLÉS — utilise --dart-define en prod
+class SupabaseConfig {
+  static const String url = String.fromEnvironment(
+    'SUPABASE_URL',
+    defaultValue: 'https://VOTRE_PROJET.supabase.co',
+  );
+  static const String anonKey = String.fromEnvironment(
+    'SUPABASE_ANON_KEY',
+    defaultValue: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndncXdwdWNjcmxwemN6bXFrcGV5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE3MjQ2MjEsImV4cCI6MjEwNzMwMDYyMX0.PqaOiODKuEYR8HNAwT2RmhFYYqkZ73dM3j6lbR4cmmQ',
+  );
+}
+===== F. DB.DART (début) =====
+// lib/core/db.dart
+import 'package:supabase_flutter/supabase_flutter.dart';
+
+class Db {
+  static SupabaseClient get client => Supabase.instance.client;
+
+  // -------------------------------------------------------------------------
+  // USERS (membres inscrits)
+  // -------------------------------------------------------------------------
+  static Future<void> createUser({
+    required String paysCode,       // ex: 'BJ'
+    required String regionCode,     // ex: 'W'
+    required String email,
+    String statut = 'attente',
+  }) async {
+    await client.from('users').insert({
+      'pays': paysCode,
+      'region': regionCode,
+      'email': email,
+      'statut': statut,
+      'created_at': DateTime.now().toIso8601String(),
+    });
+  }
+
+  static Future<List<Map<String, dynamic>>> listUsers() async {
+    final res = await client.from('users').select().order('created_at', ascending: false);
+    return List<Map<String, dynamic>>.from(res);
+  }
+
+  // -------------------------------------------------------------------------
+  // CITÉS (55 pays — lecture seule, seed en SQL)
+  // -------------------------------------------------------------------------
+  static Future<List<Map<String, dynamic>>> listCites() async {
+    final res = await client.from('cites').select().order('nom');
+    return List<Map<String, dynamic>>.from(res);
+  }
+
+  static Future<List<Map<String, dynamic>>> listCitesByRegion(String region) async {
+    final res = await client.from('cites').select().eq('region', region).order('nom');
+    return List<Map<String, dynamic>>.from(res);
+  }
+
+  // -------------------------------------------------------------------------
+  // PROPOSITIONS (dashboard / vote "une voix")
+  // -------------------------------------------------------------------------
+  static Future<void> createProposition({
+    required String citeCode,
+    required String auteurEmail,
+    required String titre,
+    required String contenu,
+  }) async {
+    await client.from('propositions').insert({
+      'cite': citeCode,
+      'auteur': auteurEmail,
+      'titre': titre,
+      'contenu': contenu,
+      'votes_pour': 0,
+      'votes_contre': 0,
+      'created_at': DateTime.now().toIso8601String(),
+    });
+
+===== G. PUBSPEC RÉEL =====
+name: ligue_panafricaine_neurocitoyens
+description: Ligue Panafricaine V9.2 Production Finale - Dashboard complet, QR, arbre, universite
+publish_to: 'none'
+version: 9.2.0+1
+environment:
+  sdk: ">=3.3.0 <4.0.0"
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_riverpod: ^2.6.1
+  go_router: ^14.8.1
+  supabase_flutter: ^2.5.6
+  intl: ^0.19.0
+  shared_preferences: ^2.2.2
+  qr_flutter: ^4.1.0
+  firebase_core: ^4.15.0
+  cloud_firestore: ^6.10.0
+  firebase_auth: ^6.7.0
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^3.0.0
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/geo/africa_50m.json
+===== H. PUBSPEC_EXTRAIT (modifié non commité) =====
+diff --git a/pubspec_extrait.yaml b/pubspec_extrait.yaml
+index 8a06bea..1c1e2a0 100644
+--- a/pubspec_extrait.yaml
++++ b/pubspec_extrait.yaml
+@@ -11,10 +11,9 @@ dependencies:
+     sdk: flutter
+   cupertino_icons: ^1.0.8
+   go_router: ^14.8.1
+-  firebase_core: ^3.8.0
+-  cloud_firestore: ^5.5.0
+-  firebase_auth: ^5.3.2
++  supabase_flutter: ^2.8.0
+   google_fonts: ^6.2.1
++  shared_preferences: ^2.3.2
+ 
+ dev_dependencies:
+   flutter_test:
+
+===== I. VERCEL.JSON ? =====
+-rw-r--r--  1 rodrigueeliebelogoun  staff  140 oct.  12 11:46 vercel.json
+
+===== J. GITHUB WORKFLOWS ? =====
+❌ PAS de workflow CI
+
+===== K. GITIGNORE =====
+# Flutter
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+pubspec.lock
+build/
+*.lock
+# Backups que tu as créés
+lib_backup_avant_nettoyage/
+../ligue_v9_4_lib_backup_*
+../_archive_lib/
+../ligue_archive/
+# Vercel
+.vercel
+# macOS
+.DS_Store
+.env*
+
+===== L. WEB/INDEX.HTML =====
+<!DOCTYPE html>
+<html>
+<head>
+  <base href="$FLUTTER_BASE_HREF">
+  <meta charset="UTF-8">
+  <meta content="IE=Edge" http-equiv="X-UA-Compatible">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover">
+  
+  <title>Ligue Panafricaine des Neurocitoyens</title>
+  <meta name="description" content="55 Cités, 5 Régions, 6 Niveaux de gouvernance. Une fédération de Cités. Une voix par membre.">
+
+  <!-- FAVICON -->
+  <link rel="icon" type="image/png" href="favicon.png"/>
+  <link rel="apple-touch-icon" href="icons/Icon-192.png">
+
+  <!-- OPEN GRAPH - C'est ça qui fait apparaître le logo sur WhatsApp/Facebook -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://neurocitoyenapp.vercel.app/">
+  <meta property="og:title" content="Ligue Panafricaine des Neurocitoyens">
+  <meta property="og:description" content="Une fédération de Cités. Une voix par membre. 55 Cités, 5 Régions, 6 Niveaux.">
+  <meta property="og:image" content="https://neurocitoyenapp.vercel.app/icons/Icon-512.png">
+  <meta property="og:image:width" content="512">
+  <meta property="og:image:height" content="512">
+  
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Ligue Panafricaine des Neurocitoyens">
+  <meta name="twitter:description" content="Une fédération de Cités. Une voix par membre.">
+  <meta name="twitter:image" content="https://neurocitoyenapp.vercel.app/icons/Icon-512.png">
+
+  <link rel="manifest" href="manifest.json">
+</head>
+<body>
+  <script src="flutter_bootstrap.js" async></script>
+</body>
+</html>
+===== M. web/manifest.json =====
+{"name":"Ligue","short_name":"Ligue","start_url":".","display":"standalone","background_color":"#080C1F","theme_color":"#080C1F"}
