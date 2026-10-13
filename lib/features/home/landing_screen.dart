@@ -390,11 +390,11 @@ class _HeroState extends State<_Hero> {
     return Container(
       padding: const EdgeInsets.fromLTRB(16, 14, 16, 16),
       decoration: BoxDecoration(
-        color: _C.nuit3.withValues(alpha: 0.9),
+        color: _C.nuit3.withOpacity(0.9),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: _C.or.withValues(alpha: 0.5)),
+        border: Border.all(color: _C.or.withOpacity(0.5)),
         boxShadow: [
-          BoxShadow(color: _C.or.withValues(alpha: 0.15), blurRadius: 40)
+          BoxShadow(color: _C.or.withOpacity(0.15), blurRadius: 40)
         ],
       ),
       child: Column(
@@ -448,7 +448,7 @@ class _HeroState extends State<_Hero> {
       onSelected: (_) => setState(() => _region = selected ? null : code),
       selectedColor: color,
       backgroundColor: Colors.white10,
-      side: BorderSide(color: color.withValues(alpha: 0.7)),
+      side: BorderSide(color: color.withOpacity(0.7)),
       labelStyle: TextStyle(
         color: selected ? Colors.white : Colors.white70,
         fontSize: 12,
@@ -476,7 +476,7 @@ class _EmblemPainter extends CustomPainter {
         Paint()
           ..style = PaintingStyle.stroke
           ..strokeWidth = 0.8
-          ..color = _C.or.withValues(alpha: 0.6));
+          ..color = _C.or.withOpacity(0.6));
     canvas.drawCircle(c, r * 0.5,
         Paint()
           ..style = PaintingStyle.stroke
@@ -720,9 +720,9 @@ class _Cooperative extends StatelessWidget {
             width: double.infinity,
             padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
-              color: _C.or.withValues(alpha: 0.12),
+              color: _C.or.withOpacity(0.12),
               borderRadius: BorderRadius.circular(14),
-              border: Border.all(color: _C.or.withValues(alpha: 0.5)),
+              border: Border.all(color: _C.or.withOpacity(0.5)),
             ),
             child: const Text(
               'Entrée sans barrière : une première étape gratuite, un paiement fractionné par mobile money, '
@@ -767,7 +767,7 @@ class _Pillar extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(22),
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.06),
+        color: Colors.white.withOpacity(0.06),
         borderRadius: BorderRadius.circular(14),
         border: Border.all(color: Colors.white12),
       ),
@@ -801,9 +801,9 @@ class _Diaspora extends StatelessWidget {
         padding: const EdgeInsets.all(24),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: _C.or.withValues(alpha: 0.5)),
+          border: Border.all(color: _C.or.withOpacity(0.5)),
           gradient: LinearGradient(
-              colors: [_C.or.withValues(alpha: 0.10), Colors.transparent]),
+              colors: [_C.or.withOpacity(0.10), Colors.transparent]),
         ),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,

@@ -169,7 +169,7 @@ class _MapPainter extends CustomPainter {
   @override void paint(Canvas canvas, Size size) {
     canvas.save(); canvas.scale(scale);
     final fill = Paint()..style = PaintingStyle.fill;
-    final border = Paint()..style = PaintingStyle.stroke..strokeWidth = 0.9..strokeJoin = StrokeJoin.round..color = Colors.white.withValues(alpha: 0.85);
+    final border = Paint()..style = PaintingStyle.stroke..strokeWidth = 0.9..strokeJoin = StrokeJoin.round..color = Colors.white.withOpacity(0.85);
     for (final c in geo.countries) {
       final base = kRegions[c.region]!.color;
       final dim = region!= null && c.region!= region;
@@ -187,7 +187,7 @@ class _MapPainter extends CustomPainter {
       for (final c in geo.countries) {
         if (region!= null && c.region!= region) continue;
         final a = geo.anchors[c.region]; if (a == null) continue;
-        line.color = kRegions[c.region]!.color.withValues(alpha: 0.65);
+        line.color = kRegions[c.region]!.color.withOpacity(0.65);
         canvas.drawLine(a, c.centroid, line);
       }
       final mansaLine = Paint()..style = PaintingStyle.stroke..strokeWidth = 1.8..color = _gold;
@@ -231,7 +231,7 @@ class _MapPainter extends CustomPainter {
   }
   void _text(Canvas canvas, String t, Offset center, double fontSize, Color color, FontWeight weight, {bool halo = false}) {
     if (halo) {
-      final h = TextPainter(text: TextSpan(text: t, style: TextStyle(fontSize: fontSize, fontWeight: weight, foreground: Paint()..style = PaintingStyle.stroke..strokeWidth = fontSize * 0.28..strokeJoin = StrokeJoin.round..color = Colors.white.withValues(alpha: 0.92))), textDirection: TextDirection.ltr)..layout();
+      final h = TextPainter(text: TextSpan(text: t, style: TextStyle(fontSize: fontSize, fontWeight: weight, foreground: Paint()..style = PaintingStyle.stroke..strokeWidth = fontSize * 0.28..strokeJoin = StrokeJoin.round..color = Colors.white.withOpacity(0.92))), textDirection: TextDirection.ltr)..layout();
       h.paint(canvas, center - Offset(h.width / 2, h.height / 2));
     }
     final tp = TextPainter(text: TextSpan(text: t, style: TextStyle(fontSize: fontSize, fontWeight: weight, color: color)), textDirection: TextDirection.ltr)..layout();
@@ -244,6 +244,6 @@ void showCountrySheet(BuildContext context, CountryShape c) {
   final region = kRegions[c.region]!;
   final pilot = c.id == 'BEN';
   const serif = TextStyle(fontFamily: 'Georgia', fontFamilyFallback: ['Times New Roman', 'serif'], fontSize: 28, color: Colors.white, fontWeight: FontWeight.w700);
-  Widget pill(String text, Color color) => Container(padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6), decoration: BoxDecoration(color: color.withValues(alpha: 0.25), borderRadius: BorderRadius.circular(20), border: Border.all(color: color)), child: Text(text, style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w600)));
+  Widget pill(String text, Color color) => Container(padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6), decoration: BoxDecoration(color: color.withOpacity(0.25), borderRadius: BorderRadius.circular(20), border: Border.all(color: color)), child: Text(text, style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w600)));
   showModalBottomSheet<void>(context: context, backgroundColor: Colors.transparent, isScrollControlled: true, builder: (ctx) => Container(padding: EdgeInsets.fromLTRB(24, 24, 24, 32 + MediaQuery.of(ctx).padding.bottom), decoration: BoxDecoration(color: const Color(0xFF0B102E), borderRadius: const BorderRadius.vertical(top: Radius.circular(24)), border: Border(top: BorderSide(color: region.color, width: 4))), child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [Text(c.name, style: serif), const SizedBox(height: 4), Text('Cité des Neurocitoyens · ${c.name}', style: const TextStyle(color: Color(0xFFF0D9A0))), const SizedBox(height: 16), Wrap(spacing: 8, runSpacing: 8, children: [pill(region.name, region.color), pill(pilot? 'Cité pilote' : 'Cité à constituer', pilot? _gold : Colors.white24)]), const SizedBox(height: 16), const Text('Dirigeant de la Cité : le Mwalimu, élu par le Forum de la Cité. Région : un Ola. Ligue : le Mansa.', style: TextStyle(color: Colors.white70, height: 1.5)), const SizedBox(height: 20), Row(children: [Expanded(child: ElevatedButton(onPressed: () { Navigator.of(ctx).pop(); context.go('/inscription?pays=${c.a2}'); }, style: ElevatedButton.styleFrom(backgroundColor: _gold, foregroundColor: Colors.black, padding: const EdgeInsets.symmetric(vertical: 16), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30))), child: const Text('REJOINDRE CETTE CITÉ', style: TextStyle(fontWeight: FontWeight.w900)))), const SizedBox(width: 12), TextButton(onPressed: () => Navigator.of(ctx).pop(), child: const Text('Fermer', style: TextStyle(color: Colors.white70)))])])) );
 }
