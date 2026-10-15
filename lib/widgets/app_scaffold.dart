@@ -1,11 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../core/l10n.dart';
 
-class AppScaffold extends StatelessWidget {
+class AppScaffold extends StatefulWidget {
   final Widget child;
   final String title;
   const AppScaffold({super.key, required this.child, required this.title});
+  @override
+  State<AppScaffold> createState() => _AppScaffoldState();
+}
+
+class _AppScaffoldState extends State<AppScaffold> {
+  bool _logged = false;
+  @override
+  void initState(){ super.initState(); _check(); }
+  Future<void> _check() async {
+    final p = await SharedPreferences.getInstance();
+    setState(()=> _logged = p.getString('code_parrain')!=null);
+  }
 
   @override
   Widget build(BuildContext context){
@@ -13,8 +26,17 @@ class AppScaffold extends StatelessWidget {
       backgroundColor: const Color(0xFF080C1F),
       appBar: AppBar(
         backgroundColor: const Color(0xFF080C1F),
-        title: Text(title, style: const TextStyle(fontSize:13)),
+        title: Text(widget.title, style: const TextStyle(fontSize:13)),
         actions: [
+          if(!_logged)
+            Padding(
+              padding: const EdgeInsets.only(right:8),
+              child: FilledButton(
+                style: FilledButton.styleFrom(backgroundColor: const Color(0xFFFFC400), foregroundColor: Colors.black, padding: const EdgeInsets.symmetric(horizontal:12, vertical:0), minimumSize: const Size(0,32)),
+                onPressed: ()=> context.go('/connexion'),
+                child: const Text('Se connecter', style: TextStyle(fontSize:11, fontWeight: FontWeight.bold)),
+              ),
+            ),
           IconButton(icon: const Icon(Icons.smart_toy, color: Color(0xFFFFC400)), tooltip: 'IA Guide', onPressed: ()=>context.go('/ia-guide')),
           IconButton(icon: const Icon(Icons.person), onPressed: ()=>context.go('/profil')),
         ],
@@ -36,6 +58,8 @@ class AppScaffold extends StatelessWidget {
           _item(context, Icons.attach_money, L10n.t('modele'), '/modele-eco'),
           _item(context, Icons.admin_panel_settings, L10n.t('admin'), '/admin'),
           const Divider(color: Colors.white10),
+          if(!_logged)
+            ListTile(leading: const Icon(Icons.login, color: Color(0xFFFFC400)), title: const Text('Se connecter', style: TextStyle(color: Color(0xFFFFC400), fontSize:12, fontWeight: FontWeight.bold)), onTap: ()=>context.go('/connexion')),
           ListTile(leading: const Icon(Icons.smart_toy, color: Color(0xFFFFC400)), title: const Text('IA Guide - Charte & Modele', style: TextStyle(color: Color(0xFFFFC400), fontSize:12)), onTap: ()=>context.go('/ia-guide')),
         ]),
       ),
@@ -57,7 +81,7 @@ class AppScaffold extends StatelessWidget {
         ],
       ),
       body: Stack(children:[
-        child,
+        widget.child,
         Positioned(bottom: 80, right: 16, child: FloatingActionButton.small(onPressed: ()=>context.go('/ia-guide'), backgroundColor: const Color(0xFFFFC400), child: const Icon(Icons.smart_toy, color: Colors.black))),
       ]),
     );
