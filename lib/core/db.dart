@@ -4,68 +4,130 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 class Db {
   static SupabaseClient get client => Supabase.instance.client;
 
-  // -------------------------------------------------------------------------
-  // USERS (membres inscrits)
-  // -------------------------------------------------------------------------
-  static Future<void> createUser({
-    required String paysCode,       // ex: 'BJ'
-    required String regionCode,     // ex: 'W'
+  // ==========================================================================
+  // USERS — Inscription
+  // ==========================================================================
+  static Future<Map<String, dynamic>> createUser({
+    required String pseudo,
+    required String nom,
+    required String prenoms,
     required String email,
-    String statut = 'attente',
+    required String paysId,
+    required String codeCooptation,
+    String? codeParrain,
+    String? departement,
+    String? commune,
+    String? villageQuartier,
+    String? profession,
+    int? age,
+    String? trancheAge,
+    String? niveauEtude,
+    String? domainePro,
+    List<String>? domainesInteret,
   }) async {
-    await client.from('users').insert({
-      'pays': paysCode,
-      'region': regionCode,
-      'email': email,
-      'statut': statut,
-      'created_at': DateTime.now().toIso8601String(),
-    });
+    // 1. Retrouver l'ID du parrain si code fourni
+    String? parrainId;
+    if (codeParrain != null && codeParrain.isNotEmpty) {
+      final parrainRes = await client
+          .from('users')
+          .select('id')
+          .eq('mon_code_cooptation', codeParrain)
+          .maybeSingle();
+      parrainId = parrainRes?['id'] as String?;
+    }
+
+    // 2. Insérer le nouvel utilisateur
+    final res = await client
+        .from('users')
+        .insert({
+          'pseudo': pseudo,
+          'nom': nom,
+          'prenoms': prenoms,
+          'email': email,
+          'pays_id': paysId,
+          'mon_code_cooptation': codeCooptation,
+          if (codeParrain != null) 'code_parrain': codeParrain,
+          if (parrainId != null) 'parrain_id': parrainId,
+          if (departement != null) 'departement': departement,
+          if (commune != null) 'commune': commune,
+          if (villageQuartier != null) 'village_quartier': villageQuartier,
+          if (profession != null) 'profession': profession,
+          if (age != null) 'age': age,
+          if (trancheAge != null) 'tranche_age': trancheAge,
+          if (niveauEtude != null) 'niveau_etude': niveauEtude,
+          if (domainePro != null) 'domaine_pro': domainePro,
+          if (domainesInteret != null) 'domaines_interet': domainesInteret,
+        })
+        .select()
+        .single();
+
+    // 3. Créer la cooptation si parrain trouvé
+    if (parrainId != null) {
+      await client.from('cooptations').insert({
+        'parrain_id': parrainId,
+        'filleul_id': res['id'],
+        'generation': 1,
+        'pays_id': paysId,
+      });
+    }
+
+    return res;
+  }
+
+  // ==========================================================================
+  // USERS — Lecture
+  // ==========================================================================
+  static Future<Map<String, dynamic>?> getUserByCodeParrain(String code) async {
+    return await client
+        .from('users')
+        .select()
+        .eq('mon_code_cooptation', code)
+        .maybeSingle();
   }
 
   static Future<List<Map<String, dynamic>>> listUsers() async {
-    final res = await client.from('users').select().order('created_at', ascending: false);
-    return List<Map<String, dynamic>>.from(res);
-  }
-
-  // -------------------------------------------------------------------------
-  // CITÉS (55 pays — lecture seule, seed en SQL)
-  // -------------------------------------------------------------------------
-  static Future<List<Map<String, dynamic>>> listCites() async {
-    final res = await client.from('cites').select().order('nom');
-    return List<Map<String, dynamic>>.from(res);
-  }
-
-  static Future<List<Map<String, dynamic>>> listCitesByRegion(String region) async {
-    final res = await client.from('cites').select().eq('region', region).order('nom');
-    return List<Map<String, dynamic>>.from(res);
-  }
-
-  // -------------------------------------------------------------------------
-  // PROPOSITIONS (dashboard / vote "une voix")
-  // -------------------------------------------------------------------------
-  static Future<void> createProposition({
-    required String citeCode,
-    required String auteurEmail,
-    required String titre,
-    required String contenu,
-  }) async {
-    await client.from('propositions').insert({
-      'cite': citeCode,
-      'auteur': auteurEmail,
-      'titre': titre,
-      'contenu': contenu,
-      'votes_pour': 0,
-      'votes_contre': 0,
-      'created_at': DateTime.now().toIso8601String(),
-    });
-  }
-
-  static Future<List<Map<String, dynamic>>> listPropositions(String citeCode) async {
     final res = await client
-        .from('propositions')
+        .from('users')
         .select()
-        .eq('cite', citeCode)
         .order('created_at', ascending: false);
+    return List<Map<String, dynamic>>.from(res);
+  }
+
+  // ==========================================================================
+  // COUNTRIES
+  // ==========================================================================
+  static Future<List<Map<String, dynamic>>> listCountries() async {
+    final res = await client.from('countries').select().order('nom');
+    return List<Map<String, dynamic>>.from(res);
+  }
+
+  static Future<Map<String, dynamic>?> getCountry(String id) async {
+    return await client
+        .from('countries')
+        .select()
+        .eq('id', id)
+        .maybeSingle();
+  }
+
+  // ==========================================================================
+  // REGIONS
+  // ==========================================================================
+  static Future<List<Map<String, dynamic>>> listRegions() async {
+    final res = await client.from('regions_afrique').select().order('code');
+    return List<Map<String, dynamic>>.from(res);
+  }
+
+  // ==========================================================================
+  // PROPOSITIONS
+  // ==========================================================================
+  static Future<List<Map<String, dynamic>>> listPropositions({
+    String? paysCible,
+  }) async {
+    var query = client.from('propositions').select();
+    if (paysCible != null) {
+      query = query.eq('pays_cible', paysCible);
+    }
+    final res = await query.order('created_at', ascending: false);
     return List<Map<String, dynamic>>.from(res);
   }
 }
