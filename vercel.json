@@ -1,6 +1,12 @@
 {
   "installCommand": "git clone https://github.com/flutter/flutter.git -b stable --depth 1 && ./flutter/bin/flutter config --no-analytics && ./flutter/bin/flutter precache --web && ./flutter/bin/flutter pub get",
-  "buildCommand": "./flutter/bin/flutter build web --release",
+  "buildCommand": "./flutter/bin/flutter build web --release --pwa-strategy=none",
   "outputDirectory": "build/web",
-  "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }]
+  "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }],
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [{ "key": "Cache-Control", "value": "no-cache, no-store, must-revalidate" }]
+    }
+  ]
 }
