@@ -64,7 +64,7 @@ class _CursusDetailUserScreenState extends State<CursusDetailUserScreen> {
           .select()
           .eq('cursus_id', _cursus['id'])
           .eq('actif', true)
-          .order('numero');
+          .order('numero', ascending: true);
 
       // Charger la progression utilisateur
       Map<String, Map<String, dynamic>> progress = {};
@@ -85,7 +85,7 @@ class _CursusDetailUserScreenState extends State<CursusDetailUserScreen> {
       }
 
       setState(() {
-        _modules = List<Map<String, dynamic>>.from(modules);
+        _modules = (List<Map<String, dynamic>>.from(modules)..sort((a,b)=> (a['numero'] as int? ?? 0).compareTo(b['numero'] as int? ?? 0)));
         _progress = progress;
         _loading = false;
       });
