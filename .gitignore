@@ -24,3 +24,4 @@ lib_backup_avant_nettoyage/
 build/
 .dart_tool/
 .env.local
+build/
