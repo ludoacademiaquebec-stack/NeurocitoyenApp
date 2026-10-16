@@ -20,6 +20,7 @@ import 'features/charte/institutions_screen.dart';
 import 'features/forum/forum_screen.dart';
 import 'features/banque/banque_screen.dart';
 import 'features/coop/coop_screen.dart';
+import 'features/coop/creer_coop_screen.dart';
 import 'features/profil/profil_screen.dart';
 import 'features/poles/poles_screen.dart';
 import 'features/portefeuille/portefeuille_screen.dart';
@@ -89,6 +90,7 @@ final router = GoRouter(
     GoRoute(path: '/forum', builder: (c,s)=> const ForumScreen()),
     GoRoute(path: '/banque', builder: (c,s)=> const BanqueScreen()),
     GoRoute(path: '/coop', builder: (c,s)=> const CoopScreen()),
+    GoRoute(path: '/coop/creer', builder: (c,s)=> const CreerCoopScreen()),
     GoRoute(path: '/profil', builder: (c,s)=> const ProfilScreen()),
     GoRoute(path: '/poles', builder: (c,s)=> const PolesScreen()),
     GoRoute(path: '/portefeuille', builder: (c,s) => const PortefeuilleScreen()),

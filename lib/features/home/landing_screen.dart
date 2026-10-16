@@ -84,8 +84,6 @@ class _LandingScreenState extends State<LandingScreen> {
   String? _selected;
   String? _region;
   bool _org = false;
-  String _paysSelectionne = 'BJ';
-  bool _logged = false;
 
   @override
   void initState() {
@@ -95,24 +93,8 @@ class _LandingScreenState extends State<LandingScreen> {
 
   Future<void> _checkLogin() async {
     final prefs = await SharedPreferences.getInstance();
-    final pays = prefs.getString('pays_id') ?? 'BJ';
-    if (mounted) {
-      setState(() {
-        _logged = prefs.getString('code_parrain') != null;
-        _paysSelectionne = pays;
-      });
-    }
+    prefs.getString('pays_id');
   }
-
-  void _goToMap() {
-    final ctx = _mapKey.currentContext;
-    if (ctx != null) {
-      Scrollable.ensureVisible(ctx,
-          duration: const Duration(milliseconds: 600), curve: Curves.easeInOutCubic);
-    }
-  }
-
-  void _goLogin() => context.go(_logged ? '/dashboard' : '/connexion');
 
   @override
   Widget build(BuildContext context) {
@@ -190,7 +172,7 @@ class _LandingScreenState extends State<LandingScreen> {
       ),
       body: ListView(
         children: [
-          _Hero(logged: _logged, onJoin: _goToMap, onLogin: _goLogin),
+          const _Hero(),
           KeyedSubtree(
             key: _mapKey,
             child: _MapSection(
@@ -202,7 +184,6 @@ class _LandingScreenState extends State<LandingScreen> {
               onCountryTap: (c) {
                 setState(() {
                   _selected = c.id;
-                  _paysSelectionne = c.a2;
                 });
                 showCountrySheet(context, c);
               },
@@ -212,7 +193,7 @@ class _LandingScreenState extends State<LandingScreen> {
           const _DemarcheSection(),
           const _EconomieSection(),
           const _StatsBand(),
-          _CtaFinal(logged: _logged, onJoin: _goToMap, onLogin: _goLogin),
+          const _CtaFinal(),
           const _Footer(),
         ],
       ),
@@ -231,16 +212,15 @@ class _LandingScreenState extends State<LandingScreen> {
 // BRIQUES COMMUNES
 // =============================================================================
 class _Section extends StatelessWidget {
-  const _Section({required this.color, required this.child, this.vertical = 72});
+  const _Section({required this.color, required this.child});
   final Color color;
   final Widget child;
-  final double vertical;
 
   @override
   Widget build(BuildContext context) => Container(
         width: double.infinity,
         color: color,
-        padding: EdgeInsets.symmetric(horizontal: 20, vertical: vertical),
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 72),
         child: Center(
           child: ConstrainedBox(
             constraints: const BoxConstraints(maxWidth: 1100),
@@ -342,10 +322,7 @@ class _Btn extends StatelessWidget {
 // 1. HERO
 // =============================================================================
 class _Hero extends StatelessWidget {
-  const _Hero({required this.logged, required this.onJoin, required this.onLogin});
-  final bool logged;
-  final VoidCallback onJoin;
-  final VoidCallback onLogin;
+  const _Hero();
 
   @override
   Widget build(BuildContext context) {
@@ -401,13 +378,6 @@ class _Hero extends StatelessWidget {
                         height: 1.65),
                   ),
                 ),
-                const SizedBox(height: 34),
-                Wrap(spacing: 12, runSpacing: 12, children: [
-                  _Btn('REJOINDRE MA CITÉ', onJoin, icon: Icons.arrow_forward_rounded),
-                  _Btn(logged ? 'MON ESPACE' : 'SE CONNECTER', onLogin,
-                      icon: logged ? Icons.dashboard_outlined : Icons.login,
-                      kind: _BtnKind.outlineLight),
-                ]),
                 const SizedBox(height: 44),
                 Wrap(spacing: 14, runSpacing: 8, crossAxisAlignment: WrapCrossAlignment.center, children: [
                   for (final (i, t) in ['Conscience', 'Intégrité', 'Autonomie'].indexed) ...[
@@ -988,10 +958,7 @@ class _Stat extends StatelessWidget {
 // 7. APPEL FINAL
 // =============================================================================
 class _CtaFinal extends StatelessWidget {
-  const _CtaFinal({required this.logged, required this.onJoin, required this.onLogin});
-  final bool logged;
-  final VoidCallback onJoin;
-  final VoidCallback onLogin;
+  const _CtaFinal();
 
   @override
   Widget build(BuildContext context) {
@@ -1011,13 +978,10 @@ class _CtaFinal extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 28),
-        Wrap(alignment: WrapAlignment.center, spacing: 12, runSpacing: 12, children: [
-          _Btn('REJOINDRE MA CITÉ', onJoin,
-              icon: Icons.arrow_forward_rounded, kind: _BtnKind.navy),
-          _Btn(logged ? 'MON ESPACE' : 'SE CONNECTER', onLogin,
-              icon: logged ? Icons.dashboard_outlined : Icons.login,
-              kind: _BtnKind.outlineDark),
-        ]),
+        Center(
+          child: _Btn('VOIR LA CARTE DES CITÉS', () => context.go('/carte'),
+              icon: Icons.map_outlined, kind: _BtnKind.navy),
+        ),
       ]),
     );
   }
