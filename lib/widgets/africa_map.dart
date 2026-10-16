@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:math' as math;
 
+import 'package:flutter/foundation.dart' show TargetPlatform, defaultTargetPlatform;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:go_router/go_router.dart';
@@ -13,15 +14,17 @@ class Region {
   final Color color;
 }
 
+// Palette « atlas » : tons soutenus mais harmonieux, lisibles sur fond clair
 const Map<String, Region> kRegions = {
-  'N': Region('N', 'Afrique du Nord', Color(0xFFB9772E)),
-  'W': Region('W', 'Afrique de l’Ouest', Color(0xFF2F7D6D)),
-  'C': Region('C', 'Afrique centrale', Color(0xFF7A4E8C)),
-  'E': Region('E', 'Afrique de l’Est', Color(0xFFB4473A)),
-  'S': Region('S', 'Afrique australe', Color(0xFF2E5E8C)),
+  'N': Region('N', 'Afrique du Nord', Color(0xFFC08A3E)),
+  'W': Region('W', 'Afrique de l’Ouest', Color(0xFF1F7A5C)),
+  'C': Region('C', 'Afrique centrale', Color(0xFF6C4A8F)),
+  'E': Region('E', 'Afrique de l’Est', Color(0xFFC2503F)),
+  'S': Region('S', 'Afrique australe', Color(0xFF2B6AA3)),
 };
 
 const Color _gold = Color(0xFFC4952B);
+const Color _navy = Color(0xFF0A1330);
 
 /// Un pays : tracé vectoriel déjà projeté (équivalence d'aire de Lambert).
 class CountryShape {
@@ -110,8 +113,13 @@ class AfricaGeo {
   }
 }
 
-/// Carte interactive : zoom par pincement, sélection d'un pays, filtre par région,
-/// organigramme (Mansa, Ola, Cités) superposé en option.
+/// Carte interactive : touche ou clic pour ouvrir un pays, survol (ordinateur),
+/// boutons + / − / recentrer, pincement sur mobile, filtre par région,
+/// organigramme (Mansa, Ola, Cités) en option.
+///
+/// Sur ordinateur, la molette fait défiler la page (elle ne zoome pas la carte tant
+/// qu'on n'a pas zoomé avec les boutons) ; sur mobile, un doigt fait défiler la page
+/// et deux doigts zooment la carte.
 class AfricaMap extends StatefulWidget {
   const AfricaMap({
     super.key,
@@ -133,6 +141,22 @@ class AfricaMap extends StatefulWidget {
 class _AfricaMapState extends State<AfricaMap> {
   final TransformationController _tc = TransformationController();
   late final Future<AfricaGeo> _future = AfricaGeo.load();
+  Size _view = Size.zero;
+  bool _zoomed = false;
+  CountryShape? _hover;
+
+  bool get _touch =>
+      defaultTargetPlatform == TargetPlatform.android ||
+      defaultTargetPlatform == TargetPlatform.iOS;
+
+  @override
+  void initState() {
+    super.initState();
+    _tc.addListener(() {
+      final z = _tc.value.getMaxScaleOnAxis() > 1.05;
+      if (z != _zoomed && mounted) setState(() => _zoomed = z);
+    });
+  }
 
   @override
   void dispose() {
@@ -140,12 +164,9 @@ class _AfricaMapState extends State<AfricaMap> {
     super.dispose();
   }
 
-  void _hit(AfricaGeo geo, Offset p, double pxPerUnit) {
+  CountryShape? _countryAt(AfricaGeo geo, Offset p, double pxPerUnit) {
     for (final c in geo.countries) {
-      if (c.bounds.contains(p) && c.path.contains(p)) {
-        widget.onCountryTap?.call(c);
-        return;
-      }
+      if (c.bounds.contains(p) && c.path.contains(p)) return c;
     }
     // Tolérance pour les petites îles (Seychelles, Comores, Maurice, etc.).
     final zoom = _tc.value.getMaxScaleOnAxis();
@@ -160,7 +181,28 @@ class _AfricaMapState extends State<AfricaMap> {
         bestDist = d;
       }
     }
-    if (best != null) widget.onCountryTap?.call(best);
+    return best;
+  }
+
+  void _zoomBy(double factor) {
+    if (_view == Size.zero) return;
+    final current = _tc.value.getMaxScaleOnAxis();
+    final target = (current * factor).clamp(1.0, 10.0).toDouble();
+    if (target <= 1.001) {
+      _tc.value = Matrix4.identity();
+      return;
+    }
+    final k = target / current;
+    final c = Offset(_view.width / 2, _view.height / 2);
+    final m = Matrix4.translationValues(c.dx, c.dy, 0) *
+        Matrix4.diagonal3Values(k, k, 1) *
+        Matrix4.translationValues(-c.dx, -c.dy, 0) *
+        _tc.value;
+    // Garde la carte dans le cadre
+    final s = m.getMaxScaleOnAxis();
+    m.storage[12] = m.storage[12].clamp(_view.width - _view.width * s, 0.0).toDouble();
+    m.storage[13] = m.storage[13].clamp(_view.height - _view.height * s, 0.0).toDouble();
+    _tc.value = m;
   }
 
   @override
@@ -172,7 +214,7 @@ class _AfricaMapState extends State<AfricaMap> {
           return const AspectRatio(
             aspectRatio: 1,
             child: Center(
-              child: Text('Carte indisponible', style: TextStyle(color: Colors.white70)),
+              child: Text('Carte indisponible', style: TextStyle(color: Colors.black54)),
             ),
           );
         }
@@ -184,43 +226,145 @@ class _AfricaMapState extends State<AfricaMap> {
         }
         final geo = snap.data!;
         return Semantics(
-          label: 'Carte interactive de l’Afrique : cinq régions et 55 Cités. Touchez un pays pour ouvrir sa fiche.',
+          label:
+              'Carte interactive de l’Afrique : cinq régions et 55 Cités. Touchez un pays pour ouvrir sa fiche.',
           child: AspectRatio(
             aspectRatio: geo.width / geo.height,
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(14),
-              child: InteractiveViewer(
-                transformationController: _tc,
-                minScale: 1,
-                maxScale: 10,
-                child: LayoutBuilder(
-                  builder: (context, cons) {
-                    final scale = cons.maxWidth / geo.width;
-                    return GestureDetector(
-                      behavior: HitTestBehavior.opaque,
-                      onTapUp: (d) => _hit(geo, d.localPosition / scale, scale),
-                      child: AnimatedBuilder(
-                        animation: _tc,
-                        builder: (context, _) => CustomPaint(
-                          size: cons.biggest,
-                          painter: _MapPainter(
-                            geo: geo,
-                            scale: scale,
-                            zoom: _tc.value.getMaxScaleOnAxis(),
-                            region: widget.highlightRegion,
-                            selected: widget.selectedId,
-                            showOrg: widget.showOrg,
+            child: Stack(children: [
+              Positioned.fill(
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(14),
+                  child: LayoutBuilder(
+                    builder: (context, cons) {
+                      final scale = cons.maxWidth / geo.width;
+                      _view = cons.biggest;
+                      return InteractiveViewer(
+                        transformationController: _tc,
+                        minScale: 1,
+                        maxScale: 10,
+                        panEnabled: _zoomed,
+                        scaleEnabled: _touch || _zoomed,
+                        child: MouseRegion(
+                          cursor: _hover != null
+                              ? SystemMouseCursors.click
+                              : SystemMouseCursors.basic,
+                          onHover: (e) {
+                            final c = _countryAt(geo, e.localPosition / scale, scale);
+                            if (c?.id != _hover?.id) setState(() => _hover = c);
+                          },
+                          onExit: (_) {
+                            if (_hover != null) setState(() => _hover = null);
+                          },
+                          child: GestureDetector(
+                            behavior: HitTestBehavior.opaque,
+                            onTapUp: (d) {
+                              final c = _countryAt(geo, d.localPosition / scale, scale);
+                              if (c != null) widget.onCountryTap?.call(c);
+                            },
+                            child: AnimatedBuilder(
+                              animation: _tc,
+                              builder: (context, _) => CustomPaint(
+                                size: cons.biggest,
+                                painter: _MapPainter(
+                                  geo: geo,
+                                  scale: scale,
+                                  zoom: _tc.value.getMaxScaleOnAxis(),
+                                  region: widget.highlightRegion,
+                                  selected: widget.selectedId,
+                                  hover: _hover?.id,
+                                  showOrg: widget.showOrg,
+                                ),
+                              ),
+                            ),
                           ),
                         ),
-                      ),
-                    );
-                  },
+                      );
+                    },
+                  ),
                 ),
               ),
-            ),
+              // Boutons de zoom
+              Positioned(
+                top: 8,
+                right: 8,
+                child: Column(children: [
+                  _MapButton(icon: Icons.add, tooltip: 'Zoom avant', onTap: () => _zoomBy(1.6)),
+                  const SizedBox(height: 6),
+                  _MapButton(
+                      icon: Icons.remove, tooltip: 'Zoom arrière', onTap: () => _zoomBy(1 / 1.6)),
+                  if (_zoomed) ...[
+                    const SizedBox(height: 6),
+                    _MapButton(
+                      icon: Icons.fit_screen_outlined,
+                      tooltip: 'Recentrer',
+                      onTap: () => _tc.value = Matrix4.identity(),
+                    ),
+                  ],
+                ]),
+              ),
+              // Nom du pays survolé (ordinateur)
+              if (_hover != null)
+                Positioned(
+                  left: 8,
+                  top: 8,
+                  child: IgnorePointer(child: _HoverLabel(country: _hover!)),
+                ),
+            ]),
           ),
         );
       },
+    );
+  }
+}
+
+class _MapButton extends StatelessWidget {
+  const _MapButton({required this.icon, required this.tooltip, required this.onTap});
+  final IconData icon;
+  final String tooltip;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) => Tooltip(
+        message: tooltip,
+        child: Material(
+          color: Colors.white,
+          elevation: 2,
+          shadowColor: Colors.black26,
+          borderRadius: BorderRadius.circular(10),
+          child: InkWell(
+            borderRadius: BorderRadius.circular(10),
+            onTap: onTap,
+            child: SizedBox(width: 36, height: 36, child: Icon(icon, size: 20, color: _navy)),
+          ),
+        ),
+      );
+}
+
+class _HoverLabel extends StatelessWidget {
+  const _HoverLabel({required this.country});
+  final CountryShape country;
+
+  @override
+  Widget build(BuildContext context) {
+    final region = kRegions[country.region]!;
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      decoration: BoxDecoration(
+        color: _navy.withOpacity(0.92),
+        borderRadius: BorderRadius.circular(10),
+        border: Border(left: BorderSide(color: region.color, width: 4)),
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(country.name,
+              style: const TextStyle(
+                  color: Colors.white, fontSize: 13, fontWeight: FontWeight.w800)),
+          Text(region.name,
+              style: const TextStyle(color: Color(0xFFF0D9A0), fontSize: 11)),
+        ],
+      ),
     );
   }
 }
@@ -232,6 +376,7 @@ class _MapPainter extends CustomPainter {
     required this.zoom,
     required this.region,
     required this.selected,
+    required this.hover,
     required this.showOrg,
   });
 
@@ -240,6 +385,7 @@ class _MapPainter extends CustomPainter {
   final double zoom;
   final String? region;
   final String? selected;
+  final String? hover;
   final bool showOrg;
 
   @override
@@ -250,29 +396,56 @@ class _MapPainter extends CustomPainter {
     final fill = Paint()..style = PaintingStyle.fill;
     final border = Paint()
       ..style = PaintingStyle.stroke
-      ..strokeWidth = 0.9
+      ..strokeWidth = 1.0
       ..strokeJoin = StrokeJoin.round
-      ..color = Colors.white.withOpacity(0.85);
+      ..color = Colors.white;
 
     // Pays
     for (final c in geo.countries) {
       final base = kRegions[c.region]!.color;
       final dim = region != null && c.region != region;
       final isSel = c.id == selected;
-      fill.color = base.withOpacity(isSel ? 0.95 : (dim ? 0.12 : 0.58));
+      final isHover = c.id == hover && !dim;
+      var col = base.withOpacity(isSel ? 1.0 : (dim ? 0.14 : 0.86));
+      if (isHover && !isSel) {
+        col = Color.lerp(base, Colors.white, 0.22)!.withOpacity(0.95);
+      }
+      fill.color = col;
       canvas.drawPath(c.path, fill);
       canvas.drawPath(c.path, border);
     }
 
-    // Pays sélectionné : contour or par-dessus
-    if (selected != null) {
-      final sel = geo.countries.where((c) => c.id == selected);
-      for (final c in sel) {
+    // Pays survolé : fin contour marine
+    if (hover != null && hover != selected) {
+      for (final c in geo.countries.where((c) => c.id == hover)) {
+        if (region != null && c.region != region) continue;
         canvas.drawPath(
           c.path,
           Paint()
             ..style = PaintingStyle.stroke
-            ..strokeWidth = 2.2
+            ..strokeWidth = 1.6
+            ..strokeJoin = StrokeJoin.round
+            ..color = _navy.withOpacity(0.8),
+        );
+      }
+    }
+
+    // Pays sélectionné : double contour marine + or
+    if (selected != null) {
+      for (final c in geo.countries.where((c) => c.id == selected)) {
+        canvas.drawPath(
+          c.path,
+          Paint()
+            ..style = PaintingStyle.stroke
+            ..strokeWidth = 3.6
+            ..strokeJoin = StrokeJoin.round
+            ..color = _navy,
+        );
+        canvas.drawPath(
+          c.path,
+          Paint()
+            ..style = PaintingStyle.stroke
+            ..strokeWidth = 2.0
             ..strokeJoin = StrokeJoin.round
             ..color = _gold,
         );
@@ -288,7 +461,7 @@ class _MapPainter extends CustomPainter {
         if (region != null && c.region != region) continue;
         final a = geo.anchors[c.region];
         if (a == null) continue;
-        line.color = kRegions[c.region]!.color.withOpacity(0.65);
+        line.color = kRegions[c.region]!.color.withOpacity(0.7);
         canvas.drawLine(a, c.centroid, line);
       }
       final mansaLine = Paint()
@@ -324,7 +497,8 @@ class _MapPainter extends CustomPainter {
         _text(canvas, 'OLA', a, 9, Colors.white, FontWeight.w800);
       });
       _star(canvas, geo.mansa, 24, 10);
-      _text(canvas, 'MANSA', geo.mansa + const Offset(0, 40), 12, _gold, FontWeight.w800, halo: true);
+      _text(canvas, 'MANSA', geo.mansa + const Offset(0, 40), 12, _gold, FontWeight.w800,
+          halo: true);
     }
 
     // Noms des pays (taille apparente constante)
@@ -333,7 +507,9 @@ class _MapPainter extends CustomPainter {
       if (region != null && c.region != region) continue;
       final big = c.bounds.longestSide > 90;
       if (!big && zoom < 2.2) continue;
-      _text(canvas, c.name, c.centroid + Offset(0, showOrg ? fs * 1.1 + 4 : 0), fs, const Color(0xFF0A102E), FontWeight.w600, halo: true);
+      _text(canvas, c.name, c.centroid + Offset(0, showOrg ? fs * 1.1 + 4 : 0), fs, _navy,
+          FontWeight.w700,
+          halo: true);
     }
 
     canvas.restore();
@@ -370,11 +546,12 @@ class _MapPainter extends CustomPainter {
       Paint()
         ..style = PaintingStyle.stroke
         ..strokeWidth = 2
-        ..color = const Color(0xFF060A1F),
+        ..color = _navy,
     );
   }
 
-  void _text(Canvas canvas, String t, Offset center, double fontSize, Color color, FontWeight weight,
+  void _text(Canvas canvas, String t, Offset center, double fontSize, Color color,
+      FontWeight weight,
       {bool halo = false}) {
     if (halo) {
       final h = TextPainter(
@@ -407,6 +584,7 @@ class _MapPainter extends CustomPainter {
       old.zoom != zoom ||
       old.region != region ||
       old.selected != selected ||
+      old.hover != hover ||
       old.showOrg != showOrg ||
       old.geo != geo;
 }
@@ -429,15 +607,18 @@ void showCountrySheet(BuildContext context, CountryShape c) {
           borderRadius: BorderRadius.circular(20),
           border: Border.all(color: color),
         ),
-        child: Text(text, style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w600)),
+        child: Text(text,
+            style: const TextStyle(
+                color: Colors.white, fontSize: 12, fontWeight: FontWeight.w600)),
       );
   showModalBottomSheet<void>(
     context: context,
     backgroundColor: Colors.transparent,
+    useSafeArea: true,
     builder: (ctx) => Container(
-      padding: const EdgeInsets.fromLTRB(24, 24, 24, 32),
+      padding: const EdgeInsets.fromLTRB(24, 14, 24, 32),
       decoration: BoxDecoration(
-        color: const Color(0xFF0B102E),
+        color: _navy,
         borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
         border: Border(top: BorderSide(color: region.color, width: 4)),
       ),
@@ -445,42 +626,70 @@ void showCountrySheet(BuildContext context, CountryShape c) {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          Center(
+            child: Container(
+              width: 40,
+              height: 4,
+              margin: const EdgeInsets.only(bottom: 18),
+              decoration: BoxDecoration(
+                color: Colors.white24,
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+          ),
           Text(c.name, style: serif),
           const SizedBox(height: 4),
-          Text('Cité des Neurocitoyens · ${c.name}', style: const TextStyle(color: Color(0xFFF0D9A0))),
+          Text('Cité des Neurocitoyens · ${c.name}',
+              style: const TextStyle(color: Color(0xFFF0D9A0))),
           const SizedBox(height: 16),
           Wrap(spacing: 8, runSpacing: 8, children: [
             pill(region.name, region.color),
-            pill(pilot ? 'Cité pilote' : 'Cité à constituer', pilot ? _gold : Colors.white24),
+            pill(pilot ? 'Cité pilote' : 'Cité à constituer', pilot ? _gold : Colors.white38),
           ]),
           const SizedBox(height: 16),
           const Text(
             'Dirigeant de la Cité : le Mwalimu, élu par le Forum de la Cité. Région : un Ola. Ligue : le Mansa.',
             style: TextStyle(color: Colors.white70, height: 1.5),
           ),
-          const SizedBox(height: 20),
-          Row(children: [
-            Expanded(
-              child: ElevatedButton(
-                onPressed: () {
-                  Navigator.of(ctx).pop();
-                  context.go('/inscription?pays=${c.a2}');
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: _gold,
-                  foregroundColor: Colors.black,
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
-                ),
-                child: const Text('REJOINDRE CETTE CITÉ', style: TextStyle(fontWeight: FontWeight.w900)),
+          const SizedBox(height: 22),
+          SizedBox(
+            width: double.infinity,
+            child: ElevatedButton.icon(
+              onPressed: () {
+                Navigator.of(ctx).pop();
+                context.go('/inscription?pays=${c.a2}');
+              },
+              icon: const Icon(Icons.arrow_forward, size: 18),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFFD9AE45),
+                foregroundColor: _navy,
+                elevation: 0,
+                padding: const EdgeInsets.symmetric(vertical: 16),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
               ),
+              label: const Text('REJOINDRE CETTE CITÉ',
+                  style: TextStyle(fontWeight: FontWeight.w800, fontSize: 13, letterSpacing: 1)),
             ),
-            const SizedBox(width: 12),
-            TextButton(
-              onPressed: () => Navigator.of(ctx).pop(),
-              child: const Text('Fermer', style: TextStyle(color: Colors.white70)),
+          ),
+          const SizedBox(height: 10),
+          SizedBox(
+            width: double.infinity,
+            child: OutlinedButton.icon(
+              onPressed: () {
+                Navigator.of(ctx).pop();
+                context.go('/connexion');
+              },
+              icon: const Icon(Icons.login, size: 18),
+              style: OutlinedButton.styleFrom(
+                foregroundColor: const Color(0xFFD9AE45),
+                side: const BorderSide(color: Color(0xFFD9AE45), width: 1.5),
+                padding: const EdgeInsets.symmetric(vertical: 16),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+              ),
+              label: const Text('SE CONNECTER',
+                  style: TextStyle(fontWeight: FontWeight.w800, fontSize: 13, letterSpacing: 1)),
             ),
-          ]),
+          ),
         ],
       ),
     ),
