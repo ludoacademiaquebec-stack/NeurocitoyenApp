@@ -7,6 +7,7 @@ import 'features/panafricain/carte_afrique_screen.dart';
 import 'features/auth/inscription_v2_screen.dart';
 import 'features/admin/admin_screen.dart';
 import 'features/admin/login_admin_screen.dart';
+import 'features/auth/login_user_screen.dart';
 import 'features/admin/admin_super_screen.dart';
 import 'features/modules/modules_screen.dart';
 import 'features/ia/ia_enseignant_screen.dart';
@@ -41,7 +42,8 @@ final router = GoRouter(
     // 1. Routes publiques (toujours accessibles)
     const publicRoutes = [
       '/', '/carte', '/inscription', '/charte', '/modele-eco',
-      '/institutions', '/ia-guide', '/poles', '/admin-login'
+      '/institutions', '/ia-guide', '/poles', '/admin-login',
+      '/connexion', '/login', '/universite'
     ];
     if (publicRoutes.contains(loc)) return null;
 
@@ -71,8 +73,8 @@ final router = GoRouter(
     GoRoute(path: '/inscription', builder: (c,s){ final p = s.uri.queryParameters['pays'] ?? 'BJ'; return InscriptionScreen(paysId: p); }),
     GoRoute(path: '/admin', builder: (c,s)=> const AdminScreen()),
     GoRoute(path: '/admin-login', builder: (c,s)=> const LoginAdminScreen()),
- GoRoute(path: '/connexion', builder: (c,s)=> const LoginAdminScreen()),
- GoRoute(path: '/login', builder: (c,s)=> const LoginAdminScreen()),
+ GoRoute(path: '/connexion', builder: (c,s)=> const LoginUserScreen()),
+ GoRoute(path: '/login', builder: (c,s)=> const LoginUserScreen()),
  GoRoute(path: '/connexion-citoyen', builder: (c,s){ final red = s.uri.queryParameters['redirect']; return InscriptionScreen(paysId: 'BJ'); }),
     GoRoute(path: '/admin-super', builder: (c,s)=> const AdminSuperScreen()),
     GoRoute(path: '/modules', builder: (c,s)=> const ModulesScreen()),
