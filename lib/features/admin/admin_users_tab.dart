@@ -101,12 +101,23 @@ class _AdminUsersTabState extends State<AdminUsersTab> {
       return const Center(child: CircularProgressIndicator(color: _C.or));
     }
 
-    return Column(
-      children: [
-        _header(),
-        _filtres(),
-        Expanded(child: _liste()),
-      ],
+    return Scaffold(
+      backgroundColor: _C.nuit,
+      body: Column(
+        children: [
+          _header(),
+          _filtres(),
+          Expanded(child: _liste()),
+        ],
+      ),
+      floatingActionButton: FloatingActionButton.extended(
+        backgroundColor: _C.or,
+        foregroundColor: Colors.black,
+        onPressed: _showCreateUserDialog,
+        icon: const Icon(Icons.person_add),
+        label: const Text('Nouvel utilisateur',
+            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
+      ),
     );
   }
 
@@ -740,6 +751,169 @@ class _AdminUsersTabState extends State<AdminUsersTab> {
         'user_email': _db.auth.currentUser?.email,
       });
     } catch (_) {}
+  }
+
+  void _showCreateUserDialog() {
+    final emailCtrl = TextEditingController();
+    final pwdCtrl = TextEditingController();
+    final pseudoCtrl = TextEditingController();
+    final nomCtrl = TextEditingController();
+    final prenomsCtrl = TextEditingController();
+    final codeCtrl = TextEditingController();
+    String pays = 'BJ';
+    String role = 'membre';
+    bool loading = false;
+
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx, setDialogState) => AlertDialog(
+          backgroundColor: _C.nuit2,
+          title: Text('Nouvel utilisateur', style: _serif(18, color: _C.orClair)),
+          content: SizedBox(
+            width: 420,
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  _fieldCtrl(emailCtrl, 'Email *', keyboardType: TextInputType.emailAddress),
+                  const SizedBox(height: 8),
+                  _fieldCtrl(pwdCtrl, 'Mot de passe * (min 6 caractères)',
+                      obscure: true),
+                  const SizedBox(height: 8),
+                  _fieldCtrl(pseudoCtrl, 'Pseudo *'),
+                  const SizedBox(height: 8),
+                  _fieldCtrl(nomCtrl, 'Nom *'),
+                  const SizedBox(height: 8),
+                  _fieldCtrl(prenomsCtrl, 'Prénoms *'),
+                  const SizedBox(height: 8),
+                  _fieldCtrl(codeCtrl, 'Code de cooptation (auto si vide)'),
+                  const SizedBox(height: 8),
+                  DropdownButtonFormField<String>(
+                    initialValue: pays,
+                    decoration: _inputDeco('Pays'),
+                    dropdownColor: _C.nuit2,
+                    style: const TextStyle(color: Colors.white),
+                    items: const [
+                      DropdownMenuItem(value: 'BJ', child: Text('Bénin')),
+                      DropdownMenuItem(value: 'TG', child: Text('Togo')),
+                      DropdownMenuItem(value: 'CI', child: Text('Côte d\'Ivoire')),
+                      DropdownMenuItem(value: 'SN', child: Text('Sénégal')),
+                      DropdownMenuItem(value: 'CD', child: Text('RD Congo')),
+                      DropdownMenuItem(value: 'CM', child: Text('Cameroun')),
+                      DropdownMenuItem(value: 'CA', child: Text('Canada')),
+                    ],
+                    onChanged: (v) => setDialogState(() => pays = v ?? 'BJ'),
+                  ),
+                  const SizedBox(height: 8),
+                  DropdownButtonFormField<String>(
+                    initialValue: role,
+                    decoration: _inputDeco('Rôle'),
+                    dropdownColor: _C.nuit2,
+                    style: const TextStyle(color: Colors.white),
+                    items: const [
+                      DropdownMenuItem(value: 'membre', child: Text('Membre')),
+                      DropdownMenuItem(value: 'admin', child: Text('Admin')),
+                      DropdownMenuItem(value: 'super_admin', child: Text('Super Admin')),
+                    ],
+                    onChanged: (v) => setDialogState(() => role = v ?? 'membre'),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: loading ? null : () => Navigator.pop(ctx),
+              child: const Text('Annuler', style: TextStyle(color: Colors.white54)),
+            ),
+            FilledButton(
+              style: FilledButton.styleFrom(backgroundColor: _C.or),
+              onPressed: loading
+                  ? null
+                  : () async {
+                      if (emailCtrl.text.isEmpty ||
+                          pwdCtrl.text.length < 6 ||
+                          pseudoCtrl.text.isEmpty ||
+                          nomCtrl.text.isEmpty ||
+                          prenomsCtrl.text.isEmpty) {
+                        _toast('Champs obligatoires manquants ou mot de passe trop court', rouge: true);
+                        return;
+                      }
+                      setDialogState(() => loading = true);
+                      try {
+                        final code = codeCtrl.text.trim().isEmpty
+                            ? '${pays}-${DateTime.now().millisecondsSinceEpoch.toString().substring(7)}'
+                            : codeCtrl.text.trim();
+
+                        // 1. Créer dans auth.users
+                        final authRes = await _db.auth.signUp(
+                          email: emailCtrl.text.trim(),
+                          password: pwdCtrl.text,
+                        );
+                        final newUserId = authRes.user?.id;
+                        if (newUserId == null) {
+                          throw Exception('Échec création auth');
+                        }
+
+                        // 2. Créer dans public.users
+                        await _db.from('users').insert({
+                          'id': newUserId,
+                          'email': emailCtrl.text.trim(),
+                          'pseudo': pseudoCtrl.text.trim(),
+                          'nom': nomCtrl.text.trim(),
+                          'prenoms': prenomsCtrl.text.trim(),
+                          'pays_id': pays,
+                          'role_systeme': role,
+                          'mon_code_cooptation': code,
+                          'grade': 'Aspirant',
+                        });
+
+                        if (mounted) {
+                          Navigator.pop(ctx);
+                          _toast('Utilisateur créé avec succès');
+                          _load();
+                        }
+                      } catch (e) {
+                        setDialogState(() => loading = false);
+                        _toast('Erreur : $e', rouge: true);
+                      }
+                    },
+              child: loading
+                  ? const SizedBox(
+                      width: 16,
+                      height: 16,
+                      child: CircularProgressIndicator(color: Colors.black, strokeWidth: 2))
+                  : const Text('Créer', style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _fieldCtrl(TextEditingController ctrl, String hint,
+      {bool obscure = false, TextInputType? keyboardType}) {
+    return TextField(
+      controller: ctrl,
+      obscureText: obscure,
+      keyboardType: keyboardType,
+      style: const TextStyle(color: Colors.white),
+      decoration: _inputDeco(hint),
+    );
+  }
+
+  InputDecoration _inputDeco(String hint) {
+    return InputDecoration(
+      hintText: hint,
+      hintStyle: const TextStyle(color: Colors.white38, fontSize: 12),
+      filled: true,
+      fillColor: _C.nuit3,
+      border: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: const BorderSide(color: Colors.white12)),
+      enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: const BorderSide(color: Colors.white12)),
+      focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: const BorderSide(color: _C.or)),
+    );
   }
 
   void _toast(String msg, {bool rouge = false}) {

@@ -5,14 +5,49 @@ class CoopService {
   static SupabaseClient get _db => Supabase.instance.client;
 
   // ===========================================================================
-  // UTILISATEUR CONNECTÉ (Supabase auth OU SharedPreferences)
+  // UTILISATEUR CONNECTÉ (Supabase auth OU SharedPreferences ou code_parrain)
   // ===========================================================================
   static Future<String?> getCurrentUserId() async {
+    // 1. Supabase Auth (login admin, inscription via Supabase)
     final supabaseUser = _db.auth.currentUser;
-    if (supabaseUser != null) return supabaseUser.id;
+    if (supabaseUser != null) {
+      // Vérifie que l'utilisateur existe dans la table users
+      final row = await _db
+          .from('users')
+          .select('id')
+          .eq('id', supabaseUser.id)
+          .maybeSingle();
+      if (row != null) return supabaseUser.id;
+    }
 
+    // 2. SharedPreferences : user_id direct
     final prefs = await SharedPreferences.getInstance();
-    return prefs.getString('user_id');
+    final prefsUserId = prefs.getString('user_id');
+    if (prefsUserId != null && prefsUserId.isNotEmpty) return prefsUserId;
+
+    // 3. SharedPreferences : code_parrain (login user Flutter)
+    final codeParrain = prefs.getString('code_parrain');
+    if (codeParrain != null && codeParrain.isNotEmpty) {
+      final row = await _db
+          .from('users')
+          .select('id')
+          .eq('mon_code_cooptation', codeParrain)
+          .maybeSingle();
+      if (row != null) return row['id'] as String;
+    }
+
+    // 4. SharedPreferences : email
+    final email = prefs.getString('email');
+    if (email != null && email.isNotEmpty) {
+      final row = await _db
+          .from('users')
+          .select('id')
+          .eq('email', email)
+          .maybeSingle();
+      if (row != null) return row['id'] as String;
+    }
+
+    return null;
   }
 
   // ===========================================================================

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import '../../widgets/app_scaffold.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -113,26 +114,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: _C.nuit,
-      appBar: AppBar(
-        backgroundColor: _C.nuit,
-        title: const Text('TABLEAU DE BORD',
-            style: TextStyle(
-                fontSize: 11,
-                letterSpacing: 3,
-                color: Colors.white70,
-                fontWeight: FontWeight.bold)),
-        actions: [
-          IconButton(
-              icon: const Icon(Icons.smart_toy, color: Color(0xFFFFC400)),
-              onPressed: () => context.go('/ia-guide')),
-          IconButton(
-              icon: const Icon(Icons.home, color: _C.or),
-              onPressed: () => context.go('/')),
-        ],
-      ),
-      body: ListView(
+    return AppScaffold(
+      title: 'Tableau de bord',
+      child: ListView(
         children: [
           _welcomeHeader(),
           _cheminementBanner(),
