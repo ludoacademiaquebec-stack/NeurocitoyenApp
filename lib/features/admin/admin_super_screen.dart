@@ -10,6 +10,7 @@ import 'admin_prix_tab.dart';
 import 'admin_users_tab.dart';
 import 'admin_journal_tab.dart';
 import 'admin_universite_tab.dart';
+import 'admin_cooperatives_tab.dart';
 
 class _C {
   static const nuit = Color(0xFF060A1F);
