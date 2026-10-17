@@ -51,7 +51,7 @@ class _AdminSuperScreenState extends State<AdminSuperScreen>
   void initState() {
     super.initState();
     // 8 onglets
-    _tabCtrl = TabController(length: 8, vsync: this);
+    _tabCtrl = TabController(length: 9, vsync: this);
     _load();
   }
 
@@ -190,6 +190,7 @@ class _AdminSuperScreenState extends State<AdminSuperScreen>
             Tab(icon: Icon(Icons.account_balance, size: 18), text: 'Institutionnel'),
             Tab(icon: Icon(Icons.diamond, size: 18), text: 'Économie'),
             Tab(icon: Icon(Icons.school, size: 18), text: 'Université'),
+            Tab(icon: Icon(Icons.handshake, size: 18), text: 'Coopératives'),
             Tab(icon: Icon(Icons.tune, size: 18), text: 'Prix & Config'),
             Tab(icon: Icon(Icons.people, size: 18), text: 'Utilisateurs'),
             Tab(icon: Icon(Icons.history, size: 18), text: 'Journal'),
@@ -204,6 +205,7 @@ class _AdminSuperScreenState extends State<AdminSuperScreen>
           const AdminInstitutionsTab(),
           const AdminEcoTab(),
           const AdminUniversiteTab(),
+          const AdminCooperativesTab(),
           const AdminPrixTab(),
           const AdminUsersTab(),
           const AdminJournalTab(),
