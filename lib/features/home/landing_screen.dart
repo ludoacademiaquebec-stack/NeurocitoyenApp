@@ -20,15 +20,15 @@ const String kCoopVersion = 'V2.0';
 // Palette institutionnelle : marine, ivoire, or, émeraude
 // ---------------------------------------------------------------------------
 class _C {
-  static const nuit = Color(0xFF0A1330);
-  static const nuit2 = Color(0xFF111C45);
+  static const nuit = Color(0xFF0B2B2F);
+  static const nuit2 = Color(0xFF0E3A3D);
   static const ivoire = Color(0xFFF7F3EA);
   static const ivoire2 = Color(0xFFEDE6D3);
   static const encre = Color(0xFF0E1630); // titres sur fond clair
   static const texte = Color(0xFF3B4466); // paragraphes sur fond clair
-  static const or = Color(0xFFD9AE45); // or sur fond sombre
+  static const or = Color(0xFFE0A82E); // or sur fond sombre
   static const orFonce = Color(0xFF8A6417); // or sur fond clair
-  static const orClair = Color(0xFFF0D9A0);
+  static const orClair = Color(0xFFF0BD4A);
   static const emeraude = Color(0xFF0C4A3E);
   static const emeraude2 = Color(0xFF0F5C4D);
 }

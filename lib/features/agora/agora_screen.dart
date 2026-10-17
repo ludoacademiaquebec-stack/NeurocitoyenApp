@@ -6,11 +6,11 @@ import 'package:url_launcher/url_launcher.dart';
 import '../../widgets/app_scaffold.dart';
 
 class _C {
-  static const nuit = Color(0xFF060A1F);
-  static const nuit2 = Color(0xFF121845);
-  static const nuit3 = Color(0xFF0B102E);
-  static const or = Color(0xFFC4952B);
-  static const orClair = Color(0xFFF0D9A0);
+  static const nuit = Color(0xFF0B2B2F);
+  static const nuit2 = Color(0xFF0E3A3D);
+  static const nuit3 = Color(0xFF071D20);
+  static const or = Color(0xFFE0A82E);
+  static const orClair = Color(0xFFF0BD4A);
 }
 
 TextStyle _serif(double size, {Color color = Colors.white, FontWeight weight = FontWeight.w700}) {

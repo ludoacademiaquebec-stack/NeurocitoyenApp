@@ -13,13 +13,13 @@ import '../../widgets/africa_map.dart';
 // PALETTE
 // =============================================================================
 class _C {
-  static const nuit = Color(0xFF060A1F);
-  static const nuit2 = Color(0xFF121845);
-  static const nuit3 = Color(0xFF0B102E);
-  static const or = Color(0xFFC4952B);
-  static const orClair = Color(0xFFF0D9A0);
+  static const nuit = Color(0xFF0B2B2F);
+  static const nuit2 = Color(0xFF0E3A3D);
+  static const nuit3 = Color(0xFF071D20);
+  static const or = Color(0xFFE0A82E);
+  static const orClair = Color(0xFFF0BD4A);
   static const ivoire = Color(0xFFFBF8F1);
-  static const vert = Color(0xFF0F7A3D);
+  static const vert = Color(0xFF1D7A52);
 }
 
 TextStyle _serif(double size,
@@ -231,12 +231,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
         gradient: const LinearGradient(
-          colors: [Color(0xFF0F7A3D), Color(0xFF0A5A2D)],
+          colors: [Color(0xFF1D7A52), Color(0xFF0F4A2F)],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
         borderRadius: BorderRadius.circular(16),
-        boxShadow: [BoxShadow(color: Color(0xFF0F7A3D).withOpacity(0.3), blurRadius: 15)],
+        boxShadow: [BoxShadow(color: Color(0xFF1D7A52).withOpacity(0.3), blurRadius: 15)],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -270,7 +270,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
               onPressed: () => context.go('/mon-cheminement'),
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.white,
-                foregroundColor: const Color(0xFF0F7A3D),
+                foregroundColor: const Color(0xFF1D7A52),
                 padding: const EdgeInsets.symmetric(vertical: 14),
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
               ),

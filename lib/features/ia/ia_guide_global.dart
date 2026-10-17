@@ -8,7 +8,7 @@ class _C {
   static const bg = Color(0xFF070B1F);
   static const surface = Color(0xFF101737);
   static const field = Color(0xFF1C2452);
-  static const gold = Color(0xFFFFC400);
+  static const gold = Color(0xFFE0A82E);
   static const card = Color(0xFFF8FAFF);
   static const ink = Color(0xFF0E1533);
   static const line = Color(0xFFE2E8F8);

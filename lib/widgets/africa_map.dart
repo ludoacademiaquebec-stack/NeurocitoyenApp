@@ -23,8 +23,8 @@ const Map<String, Region> kRegions = {
   'S': Region('S', 'Afrique australe', Color(0xFF2B6AA3)),
 };
 
-const Color _gold = Color(0xFFC4952B);
-const Color _navy = Color(0xFF0A1330);
+const Color _gold = Color(0xFFE0A82E);
+const Color _navy = Color(0xFF0B2B2F);
 
 /// Un pays : tracé vectoriel déjà projeté (équivalence d'aire de Lambert).
 class CountryShape {
@@ -362,7 +362,7 @@ class _HoverLabel extends StatelessWidget {
               style: const TextStyle(
                   color: Colors.white, fontSize: 13, fontWeight: FontWeight.w800)),
           Text(region.name,
-              style: const TextStyle(color: Color(0xFFF0D9A0), fontSize: 11)),
+              style: const TextStyle(color: Color(0xFFF0BD4A), fontSize: 11)),
         ],
       ),
     );
@@ -640,7 +640,7 @@ void showCountrySheet(BuildContext context, CountryShape c) {
           Text(c.name, style: serif),
           const SizedBox(height: 4),
           Text('Cité des Neurocitoyens · ${c.name}',
-              style: const TextStyle(color: Color(0xFFF0D9A0))),
+              style: const TextStyle(color: Color(0xFFF0BD4A))),
           const SizedBox(height: 16),
           Wrap(spacing: 8, runSpacing: 8, children: [
             pill(region.name, region.color),
@@ -661,7 +661,7 @@ void showCountrySheet(BuildContext context, CountryShape c) {
               },
               icon: const Icon(Icons.arrow_forward, size: 18),
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFFD9AE45),
+                backgroundColor: const Color(0xFFE0A82E),
                 foregroundColor: _navy,
                 elevation: 0,
                 padding: const EdgeInsets.symmetric(vertical: 16),
@@ -681,8 +681,8 @@ void showCountrySheet(BuildContext context, CountryShape c) {
               },
               icon: const Icon(Icons.login, size: 18),
               style: OutlinedButton.styleFrom(
-                foregroundColor: const Color(0xFFD9AE45),
-                side: const BorderSide(color: Color(0xFFD9AE45), width: 1.5),
+                foregroundColor: const Color(0xFFE0A82E),
+                side: const BorderSide(color: Color(0xFFE0A82E), width: 1.5),
                 padding: const EdgeInsets.symmetric(vertical: 16),
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
               ),

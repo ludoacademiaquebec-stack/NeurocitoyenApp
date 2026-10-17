@@ -18,7 +18,7 @@ class _CarteAfriqueScreenState extends State<CarteAfriqueScreen> {
   bool _org = false;
   late final Future<AfricaGeo> _geo = AfricaGeo.load();
 
-  static const Color _gold = Color(0xFFC4952B);
+  static const Color _gold = Color(0xFFE0A82E);
 
   @override
   Widget build(BuildContext context) {
@@ -50,7 +50,7 @@ class _CarteAfriqueScreenState extends State<CarteAfriqueScreen> {
           Container(
             padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
-              color: const Color(0xFF0B102E),
+              color: const Color(0xFF071D20),
               borderRadius: BorderRadius.circular(18),
               border: Border.all(color: _gold.withOpacity(0.4)),
             ),

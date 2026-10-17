@@ -101,4 +101,4 @@ GoRoute(path: '/centrale-achat', builder: (c,s) => const CentraleAchatScreen()),
   ]
 );
 
-class App extends StatelessWidget { const App({super.key}); @override Widget build(BuildContext context)=> MaterialApp.router(routerConfig: router, theme: ThemeData(scaffoldBackgroundColor: const Color(0xFF080C1F), useMaterial3: true), debugShowCheckedModeBanner: false); }
+class App extends StatelessWidget { const App({super.key}); @override Widget build(BuildContext context)=> MaterialApp.router(routerConfig: router, theme: ThemeData(scaffoldBackgroundColor: const Color(0xFF0B2B2F), useMaterial3: true), debugShowCheckedModeBanner: false); }

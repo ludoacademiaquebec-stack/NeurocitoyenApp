@@ -15,19 +15,19 @@ class _AppScaffoldState extends State<AppScaffold> {
   @override
   Widget build(BuildContext context){
     return Scaffold(
-      backgroundColor: const Color(0xFF080C1F),
+      backgroundColor: const Color(0xFF0B2B2F),
       appBar: AppBar(
-        backgroundColor: const Color(0xFF080C1F),
+        backgroundColor: const Color(0xFF0B2B2F),
         title: Text(widget.title, style: const TextStyle(fontSize:13)),
         actions: [
-          IconButton(icon: const Icon(Icons.smart_toy, color: Color(0xFFFFC400)), tooltip: 'IA Guide', onPressed: ()=>context.go('/ia-guide')),
+          IconButton(icon: const Icon(Icons.smart_toy, color: Color(0xFFE0A82E)), tooltip: 'IA Guide', onPressed: ()=>context.go('/ia-guide')),
           IconButton(icon: const Icon(Icons.person), onPressed: ()=>context.go('/profil')),
         ],
       ),
       drawer: Drawer(
-        backgroundColor: const Color(0xFF101845),
+        backgroundColor: const Color(0xFF0E3A3D),
         child: ListView(children:[
-          DrawerHeader(decoration: const BoxDecoration(color: Color(0xFF080C1F)), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children:[const Text('🧠', style: TextStyle(fontSize:30)), const SizedBox(height:8), Text(L10n.t('ligue'), style: const TextStyle(color: Colors.white, fontSize:11, fontWeight: FontWeight.bold)) ])),
+          DrawerHeader(decoration: const BoxDecoration(color: Color(0xFF0B2B2F)), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children:[const Text('🧠', style: TextStyle(fontSize:30)), const SizedBox(height:8), Text(L10n.t('ligue'), style: const TextStyle(color: Colors.white, fontSize:11, fontWeight: FontWeight.bold)) ])),
           _item(context, Icons.home, 'Accueil', '/'),
           _item(context, Icons.map, L10n.t('carte'), '/carte'),
           _item(context, Icons.dashboard, L10n.t('dashboard'), '/dashboard'),
@@ -42,12 +42,12 @@ class _AppScaffoldState extends State<AppScaffold> {
           _item(context, Icons.admin_panel_settings, L10n.t('admin'), '/admin'),
           const Divider(color: Colors.white10),
           ListTile(
-            leading: const Icon(Icons.event, color: Color(0xFFFFC400)),
+            leading: const Icon(Icons.event, color: Color(0xFFE0A82E)),
             title: const Text('BIIC 2027',
-                style: TextStyle(color: Color(0xFFFFC400), fontSize: 12, fontWeight: FontWeight.bold)),
+                style: TextStyle(color: Color(0xFFE0A82E), fontSize: 12, fontWeight: FontWeight.bold)),
             subtitle: const Text('Biennale Panafricaine',
                 style: TextStyle(color: Colors.white54, fontSize: 10)),
-            trailing: const Icon(Icons.open_in_new, color: Color(0xFFFFC400), size: 14),
+            trailing: const Icon(Icons.open_in_new, color: Color(0xFFE0A82E), size: 14),
             onTap: () async {
               Navigator.of(context).pop();
               final url = (Uri.base.scheme == 'http' || Uri.base.scheme == 'https')
@@ -59,12 +59,12 @@ class _AppScaffoldState extends State<AppScaffold> {
             },
           ),
           const Divider(color: Colors.white10),
-          ListTile(leading: const Icon(Icons.smart_toy, color: Color(0xFFFFC400)), title: const Text('IA Guide - Charte & Modele', style: TextStyle(color: Color(0xFFFFC400), fontSize:12)), onTap: ()=>context.go('/ia-guide')),
+          ListTile(leading: const Icon(Icons.smart_toy, color: Color(0xFFE0A82E)), title: const Text('IA Guide - Charte & Modele', style: TextStyle(color: Color(0xFFE0A82E), fontSize:12)), onTap: ()=>context.go('/ia-guide')),
         ]),
       ),
       bottomNavigationBar: BottomNavigationBar(
-        backgroundColor: const Color(0xFF101845),
-        selectedItemColor: const Color(0xFFFFC400),
+        backgroundColor: const Color(0xFF0E3A3D),
+        selectedItemColor: const Color(0xFFE0A82E),
         unselectedItemColor: Colors.white54,
         type: BottomNavigationBarType.fixed,
         onTap: (i){
@@ -81,7 +81,7 @@ class _AppScaffoldState extends State<AppScaffold> {
       ),
       body: Stack(children:[
         widget.child,
-        Positioned(bottom: 80, right: 16, child: FloatingActionButton.small(onPressed: ()=>context.go('/ia-guide'), backgroundColor: const Color(0xFFFFC400), child: const Icon(Icons.smart_toy, color: Colors.black))),
+        Positioned(bottom: 80, right: 16, child: FloatingActionButton.small(onPressed: ()=>context.go('/ia-guide'), backgroundColor: const Color(0xFFE0A82E), child: const Icon(Icons.smart_toy, color: Colors.black))),
       ]),
     );
   }

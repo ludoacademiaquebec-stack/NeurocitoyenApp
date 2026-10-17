@@ -33,13 +33,13 @@ class _ModulesScreenState extends State<ModulesScreen> {
           bool precedentValide = m.numero==1 || (valides[m.numero-1]??false);
           bool bloque = !precedentValide;
           return Card(
-            color: valide? Colors.green.withOpacity(0.15): bloque? Colors.white.withOpacity(0.03): const Color(0xFF101845),
+            color: valide? Colors.green.withOpacity(0.15): bloque? Colors.white.withOpacity(0.03): const Color(0xFF0E3A3D),
             margin: const EdgeInsets.only(bottom:12),
             child: ListTile(
-              leading: CircleAvatar(backgroundColor: valide? Colors.green: bloque? Colors.white10: const Color(0xFFFFC400), child: Text(m.numero.toString(), style: TextStyle(color: valide||bloque? Colors.white: Colors.black, fontWeight: FontWeight.bold))),
+              leading: CircleAvatar(backgroundColor: valide? Colors.green: bloque? Colors.white10: const Color(0xFFE0A82E), child: Text(m.numero.toString(), style: TextStyle(color: valide||bloque? Colors.white: Colors.black, fontWeight: FontWeight.bold))),
               title: Text(m.titre, style: TextStyle(color: bloque? Colors.white24: Colors.white, fontWeight: FontWeight.bold, fontSize:13)),
               subtitle: Text(m.objectif + (bloque? ' (Bloque - valide Module ' + (m.numero-1).toString() + ')' : ''), style: const TextStyle(color: Colors.white54, fontSize:11)),
-              trailing: valide? const Icon(Icons.check_circle, color: Colors.green): bloque? const Icon(Icons.lock, color: Colors.white24): ElevatedButton(onPressed: ()=>context.go('/module/' + m.numero.toString()), style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFFFC400), foregroundColor: Colors.black), child: const Text('Commencer', style: TextStyle(fontSize:10))),
+              trailing: valide? const Icon(Icons.check_circle, color: Colors.green): bloque? const Icon(Icons.lock, color: Colors.white24): ElevatedButton(onPressed: ()=>context.go('/module/' + m.numero.toString()), style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFE0A82E), foregroundColor: Colors.black), child: const Text('Commencer', style: TextStyle(fontSize:10))),
             ),
           );
         },

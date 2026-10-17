@@ -60,7 +60,7 @@ class _InscriptionScreenState extends State<InscriptionScreen> {
             children: [
               LinearProgressIndicator(
                 value: (step + 1) / 4,
-                color: const Color(0xFFFFC400),
+                color: const Color(0xFFE0A82E),
                 backgroundColor: Colors.white10,
               ),
               const SizedBox(height: 12),
@@ -97,7 +97,7 @@ class _InscriptionScreenState extends State<InscriptionScreen> {
                 width: double.infinity,
                 child: ElevatedButton(
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFFFFC400),
+                    backgroundColor: const Color(0xFFE0A82E),
                     foregroundColor: Colors.black,
                     padding: const EdgeInsets.symmetric(vertical: 16),
                   ),
@@ -291,7 +291,7 @@ class _InscriptionScreenState extends State<InscriptionScreen> {
                         color: sel ? Colors.black : Colors.white70,
                         fontSize: 9)),
                 selected: sel,
-                selectedColor: const Color(0xFFFFC400),
+                selectedColor: const Color(0xFFE0A82E),
                 backgroundColor: Colors.white.withOpacity(0.06),
                 onSelected: (v) {
                   setState(() {
@@ -351,13 +351,13 @@ class _InscriptionScreenState extends State<InscriptionScreen> {
         Container(
           padding: const EdgeInsets.all(10),
           decoration: BoxDecoration(
-            color: const Color(0xFFFFC400).withOpacity(0.12),
+            color: const Color(0xFFE0A82E).withOpacity(0.12),
             borderRadius: BorderRadius.circular(8),
           ),
           child: const Text(
             'Un code de cooptation unique + 100 neuro-dollars de bienvenue '
             'seront attribués automatiquement à la création.',
-            style: TextStyle(color: Color(0xFFFFC400), fontSize: 10),
+            style: TextStyle(color: Color(0xFFE0A82E), fontSize: 10),
           ),
         ),
       ],

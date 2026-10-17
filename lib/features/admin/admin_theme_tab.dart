@@ -3,12 +3,12 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../core/app_theme_service.dart';
 
 class _C {
-  static const nuit = Color(0xFF060A1F);
-  static const nuit2 = Color(0xFF121845);
-  static const nuit3 = Color(0xFF0B102E);
+  static const nuit = Color(0xFF0B2B2F);
+  static const nuit2 = Color(0xFF0E3A3D);
+  static const nuit3 = Color(0xFF071D20);
   static const or = Color(0xFFC4952B);
   static const orClair = Color(0xFFF0D9A0);
-  static const vert = Color(0xFF0F7A3D);
+  static const vert = Color(0xFF1D7A52);
   static const rouge = Color(0xFFB4473A);
 }
 

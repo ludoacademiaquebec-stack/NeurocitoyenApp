@@ -21,7 +21,7 @@ Future<void> main() async {
   SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
     statusBarColor: Colors.transparent,
     statusBarIconBrightness: Brightness.light,
-    systemNavigationBarColor: Color(0xFF080C1F),
+    systemNavigationBarColor: Color(0xFF0B2B2F),
     systemNavigationBarIconBrightness: Brightness.light,
   ));
 
@@ -49,7 +49,7 @@ class _BootstrapError extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       home: Scaffold(
-        backgroundColor: const Color(0xFF080C1F),
+        backgroundColor: const Color(0xFF0B2B2F),
         body: SafeArea(
           child: Padding(
             padding: const EdgeInsets.all(24),
@@ -58,7 +58,7 @@ class _BootstrapError extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const Icon(Icons.warning_amber_rounded,
-                    color: Color(0xFFFFC400), size: 64),
+                    color: Color(0xFFE0A82E), size: 64),
                 const SizedBox(height: 20),
                 const Text(
                   'Initialisation Supabase échouée',

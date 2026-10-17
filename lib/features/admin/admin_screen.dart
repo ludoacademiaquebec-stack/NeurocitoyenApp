@@ -47,7 +47,7 @@ class _AdminScreenState extends State<AdminScreen> {
           ]),
           const SizedBox(height:8),
           Wrap(spacing:6, children:[
-            ElevatedButton.icon(icon: const Icon(Icons.person_add, size:12), label: const Text('Ajouter membre equipe (CRUD)', style: TextStyle(fontSize:9)), style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFFFC400), foregroundColor: Colors.black), onPressed: (){}),
+            ElevatedButton.icon(icon: const Icon(Icons.person_add, size:12), label: const Text('Ajouter membre equipe (CRUD)', style: TextStyle(fontSize:9)), style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFE0A82E), foregroundColor: Colors.black), onPressed: (){}),
             ElevatedButton.icon(icon: const Icon(Icons.forum, size:12), label: const Text('Creer Forum Continental', style: TextStyle(fontSize:9)), style: ElevatedButton.styleFrom(backgroundColor: Colors.white10, foregroundColor: Colors.white70), onPressed: (){}),
             ElevatedButton.icon(icon: const Icon(Icons.account_balance, size:12), label: const Text('Voir Tresorerie BCN', style: TextStyle(fontSize:9)), style: ElevatedButton.styleFrom(backgroundColor: Colors.white10, foregroundColor: Colors.white70), onPressed: (){}),
           ]),
@@ -61,7 +61,7 @@ class _AdminScreenState extends State<AdminScreen> {
             var cite=LigueData.getCite(u['pays']!);
             paysLabel=cite.nom + ' ' + cite.flag;
           }
-          return Card(color: const Color(0xFF101845), margin: const EdgeInsets.only(bottom:6), child: ListTile(
+          return Card(color: const Color(0xFF0E3A3D), margin: const EdgeInsets.only(bottom:6), child: ListTile(
             leading: CircleAvatar(backgroundColor: Colors.white10, child: Text(u['nom']![0], style: const TextStyle(color: Colors.white, fontSize:12))),
             title: Text(u['nom']!, style: const TextStyle(color: Colors.white, fontSize:11, fontWeight: FontWeight.bold)),
             subtitle: Text(u['email']! + ' | ' + paysLabel + ' | Grade: ' + u['grade']! + ' | Role: ' + u['role']!, style: const TextStyle(color: Colors.white54, fontSize:9)),
