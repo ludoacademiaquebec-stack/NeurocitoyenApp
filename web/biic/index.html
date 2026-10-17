@@ -33,10 +33,7 @@ nav a:hover{opacity:1;text-decoration:underline}
 .btn.ghost{color:#fff}
 .btn.ghost:hover{background:rgba(224,168,46,.18)}
 .btn.small{padding:.45rem .9rem;font-size:.9rem}
-.back-link{color:var(--gold);font-size:.88rem;font-weight:600;padding:.4rem .8rem;border:1.5px solid var(--gold);border-radius:3px;text-decoration:none;white-space:nowrap;transition:background .15s}
-.back-link:hover{background:rgba(224,168,46,.15)}
 @media(max-width:820px){nav a:not(.btn){display:none}}
-@media(max-width:600px){.back-link{font-size:.8rem;padding:.35rem .6rem}}
 
 /* Annonce et héros */
 .hero{background:var(--deep);color:#fff;padding:0 0 4.5rem;background-image:linear-gradient(180deg,#0b2b2f 0%,#0e3a3d 100%)}
@@ -67,6 +64,8 @@ section h2{font-family:var(--serif);font-size:clamp(1.7rem,3.4vw,2.5rem);line-he
 .lead{font-size:1.15rem;max-width:62ch;margin:0 0 2.2rem}
 .cols{display:grid;grid-template-columns:repeat(3,1fr);gap:1.6rem}
 .cols>div{border-top:4px solid var(--green);padding-top:1rem}
+.cols.gain{margin-top:2.2rem}
+.cols.gain>div{border-top-color:var(--gold)}
 .cols h3{font-family:var(--serif);font-size:1.3rem;margin:0 0 .5rem}
 .cols p{margin:0}
 @media(max-width:820px){.cols{grid-template-columns:1fr}}
@@ -125,31 +124,16 @@ section h2{font-family:var(--serif);font-size:clamp(1.7rem,3.4vw,2.5rem);line-he
 footer{background:#071d20;color:#b9d1c8;padding:2rem 0;font-size:.9rem}
 footer p{margin:.3rem 0}
 </style>
-
-  <!-- OPEN GRAPH - WhatsApp / Facebook / Twitter -->
-  <meta property="og:type" content="website">
-  <meta property="og:url" content="https://neurocitoyenapp.vercel.app/biic/">
-  <meta property="og:title" content="BIIC 2027 : Biennale Panafricaine de l'Incubation et de l'Installation Coopérative">
-  <meta property="og:description" content="1re édition au Togo, mars 2027. 24 mois pour préparer, 3 jours pour installer des coopératives viables sur tout le continent.">
-  <meta property="og:image" content="https://neurocitoyenapp.vercel.app/logo-partage.jpg">
-  <meta property="og:image:width" content="1200">
-  <meta property="og:image:height" content="630">
-  <meta property="og:image:type" content="image/jpeg">
-  <meta property="og:site_name" content="BIIC - Ligue Panafricaine des Neurocitoyens">
-  <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="BIIC 2027 - Biennale Panafricaine">
-  <meta name="twitter:description" content="1re édition au Togo, mars 2027. Installer des coopératives viables sur tout le continent.">
-  <meta name="twitter:image" content="https://neurocitoyenapp.vercel.app/logo-partage.jpg">
 </head>
 <body>
 
 <header class="top">
   <div class="wrap">
     <a class="brand" href="#">BIIC</a>
-    <a href="/" class="back-link">← Retour à l'application</a>
     <nav aria-label="Navigation principale">
       <a href="#modele">Le modèle</a>
       <a href="#cycle">Le cycle</a>
+      <a href="#communes">Communes</a>
       <a href="#trois-jours">Programme</a>
       <a href="#organisateurs">Organisateurs</a>
       <a class="btn solid small" href="#contact">Nous contacter</a>
@@ -216,7 +200,25 @@ footer p{margin:.3rem 0}
   </div>
 </section>
 
-<section id="trois-jours">
+<section id="communes">
+  <div class="wrap">
+    <h2>Les communes, premières clientes de leurs coopératives</h2>
+    <p class="lead">Les réseaux nationaux de maires et le réseau continental sont associés à la BIIC : le maire devient signataire, soutien local et premier client de la coopérative de son territoire.</p>
+    <div class="cols">
+      <div><h3>Un appui à chaque étape</h3><p>Identification des groupements, salles de formation, référent communal, lieux d’assemblée, accueil des délégations, signature publique du contrat territorial.</p></div>
+      <div><h3>Clientes dès le premier jour</h3><p>Les employés communaux achètent d’abord comme citoyens, puis la commune comme institution : vivres, fournitures scolaires et achats de tous les jours, en gré à gré, sans contrainte juridique particulière.</p></div>
+      <div><h3>Formés pour installer</h3><p>Entre deux Biennales, un parcours pour élus et cadres communaux ; pendant la Biennale, un panel dédié aux communes.</p></div>
+    </div>
+    <div class="cols gain">
+      <div><h3>Pour le réseau national</h3><p>Résultats mesurables dans les communes membres, reconnaissance auprès des ministères, place au comité d’orientation, formation de ses élus.</p></div>
+      <div><h3>Pour chaque maire</h3><p>Emplois et services créés, prix plus bas pour les administrés et les employés, visibilité publique, formation certifiante, réseau de pairs.</p></div>
+      <div><h3>Pour le réseau continental</h3><p>Voix dans le cadrage et le choix des territoires, échange entre communes de plusieurs pays, accès aux partenaires et financeurs continentaux.</p></div>
+    </div>
+    <p class="actions" style="margin-top:2rem"><a class="btn solid" style="color:var(--deep)" href="mailto:info@2asinternational.ca?subject=BIIC%202027%20%E2%80%93%20Communes%20et%20r%C3%A9seaux%20de%20maires">Associer ma commune ou mon réseau</a></p>
+  </div>
+</section>
+
+<section id="trois-jours" class="alt">
   <div class="wrap">
     <h2>Calendrier préliminaire des trois jours, mars 2027</h2>
     <p class="lead">La Biennale n’est pas le début du travail : c’est la preuve qu’il a été fait. Les coopératives engagées arrivent formées, constituées et pré-instruites ; leur enregistrement se déroule sur place pendant les trois jours.</p>
@@ -238,6 +240,7 @@ footer p{margin:.3rem 0}
           <li><time class="par">09h00</time><span class="par">En continu : dépôt et instruction des dossiers au guichet unique d’enregistrement</span></li>
           <li><time>10h45</time><span>Panel : financer les premières années</span></li>
           <li><time>14h00</time><span>Ateliers thématiques, six axes en parallèle</span></li>
+          <li><time class="par">14h00</time><span class="par">En parallèle : panel des maires, les communes premières clientes de leurs coopératives</span></li>
           <li><time>16h30</time><span>Pitchs des coopératives engagées et rendez-vous de financement</span></li>
           <li><time>18h00</time><span>Espace formation : parcours de la Ligue</span></li>
           <li><time>19h30</time><span>Dîner de réseautage</span></li>
@@ -258,7 +261,7 @@ footer p{margin:.3rem 0}
   </div>
 </section>
 
-<section id="organisateurs" class="alt">
+<section id="organisateurs">
   <div class="wrap">
     <h2>Une Biennale organisée par des institutions africaines et canadiennes</h2>
     <div class="orgs">
@@ -270,7 +273,7 @@ footer p{margin:.3rem 0}
     </div>
     <div class="partners">
       <h3>Avec le concours de partenaires locaux africains</h3>
-      <ul><li>Autorités et collectivités du pays hôte</li><li>Réseaux de l’économie sociale et solidaire</li><li>Institutions financières</li><li>Universités et centres de formation</li><li>Groupements de jeunes et de femmes</li></ul>
+      <ul><li>Autorités et collectivités du pays hôte</li><li>Réseaux nationaux de maires et réseau continental</li><li>Réseaux de l’économie sociale et solidaire</li><li>Institutions financières</li><li>Universités et centres de formation</li><li>Groupements de jeunes et de femmes</li></ul>
     </div>
   </div>
 </section>
@@ -292,7 +295,7 @@ footer p{margin:.3rem 0}
   <div class="wrap">
     <p><strong>BIIC</strong> : Biennale Panafricaine de l’Incubation et de l’Installation Coopérative.</p>
     <p>1re édition, Togo, mars 2027, sous le Haut Patronage de Son Excellence Monsieur Faure Essozimna Gnassingbé, Président du Conseil. Dates, lieu et programme sous réserve de confirmation.</p>
-    <p>Contact : <a href="mailto:info@2asinternational.ca">info@2asinternational.ca</a> &nbsp;·&nbsp; <a href="/">← Retour à l'application</a></p>
+    <p>Contact : <a href="mailto:info@2asinternational.ca">info@2asinternational.ca</a></p>
   </div>
 </footer>
 
