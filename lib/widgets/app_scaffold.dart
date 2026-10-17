@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../core/l10n.dart';
 
 class AppScaffold extends StatefulWidget {
@@ -39,6 +40,24 @@ class _AppScaffoldState extends State<AppScaffold> {
           _item(context, Icons.description, L10n.t('charte'), '/charte'),
           _item(context, Icons.attach_money, L10n.t('modele'), '/modele-eco'),
           _item(context, Icons.admin_panel_settings, L10n.t('admin'), '/admin'),
+          const Divider(color: Colors.white10),
+          ListTile(
+            leading: const Icon(Icons.event, color: Color(0xFFFFC400)),
+            title: const Text('BIIC 2027',
+                style: TextStyle(color: Color(0xFFFFC400), fontSize: 12, fontWeight: FontWeight.bold)),
+            subtitle: const Text('Biennale Panafricaine',
+                style: TextStyle(color: Colors.white54, fontSize: 10)),
+            trailing: const Icon(Icons.open_in_new, color: Color(0xFFFFC400), size: 14),
+            onTap: () async {
+              Navigator.of(context).pop();
+              final url = (Uri.base.scheme == 'http' || Uri.base.scheme == 'https')
+                  ? Uri.base.resolve('/biic/')
+                  : Uri.parse('https://neurocitoyenapp.vercel.app/biic/');
+              try {
+                await launchUrl(url, webOnlyWindowName: '_blank');
+              } catch (_) {}
+            },
+          ),
           const Divider(color: Colors.white10),
           ListTile(leading: const Icon(Icons.smart_toy, color: Color(0xFFFFC400)), title: const Text('IA Guide - Charte & Modele', style: TextStyle(color: Color(0xFFFFC400), fontSize:12)), onTap: ()=>context.go('/ia-guide')),
         ]),

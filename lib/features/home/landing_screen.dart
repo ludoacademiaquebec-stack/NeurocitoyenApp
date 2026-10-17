@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../core/l10n.dart';
@@ -91,6 +92,73 @@ class _LandingScreenState extends State<LandingScreen> {
     _checkLogin();
   }
 
+  Widget _buildDrawer(BuildContext context) {
+    return Drawer(
+      backgroundColor: _C.nuit,
+      child: ListView(
+        padding: EdgeInsets.zero,
+        children: [
+          DrawerHeader(
+            decoration: const BoxDecoration(color: _C.nuit2),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: const [
+                Text('🧠', style: TextStyle(fontSize: 32)),
+                SizedBox(height: 8),
+                Text('Ligue Panafricaine des Neurocitoyens',
+                    style: TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.bold)),
+              ],
+            ),
+          ),
+          _drawerItem(context, Icons.home, 'Accueil', '/'),
+          _drawerItem(context, Icons.map, 'Cités', '/carte'),
+          _drawerItem(context, Icons.school, 'Université', '/universite'),
+          _drawerItem(context, Icons.view_module, 'Modules', '/modules'),
+          _drawerItem(context, Icons.forum, 'Forum', '/forum'),
+          _drawerItem(context, Icons.description, 'Charte', '/charte'),
+          _drawerItem(context, Icons.attach_money, 'Modèle économique', '/modele-eco'),
+          _drawerItem(context, Icons.account_balance, 'Institutions', '/institutions'),
+          const Divider(color: Colors.white12),
+          ListTile(
+            leading: const Icon(Icons.event, color: _C.or),
+            title: const Text('BIIC 2027',
+                style: TextStyle(color: _C.or, fontWeight: FontWeight.bold, fontSize: 13)),
+            subtitle: const Text('Biennale Panafricaine',
+                style: TextStyle(color: Colors.white54, fontSize: 10)),
+            trailing: const Icon(Icons.open_in_new, color: _C.or, size: 16),
+            onTap: () => _openBiic(context),
+          ),
+          const Divider(color: Colors.white12),
+          _drawerItem(context, Icons.login, 'Se connecter', '/connexion'),
+          _drawerItem(context, Icons.person, 'Profil', '/profil'),
+          _drawerItem(context, Icons.smart_toy, 'IA Guide', '/ia-guide'),
+        ],
+      ),
+    );
+  }
+
+  Widget _drawerItem(BuildContext context, IconData icon, String label, String route) {
+    return ListTile(
+      leading: Icon(icon, color: Colors.white70, size: 20),
+      title: Text(label, style: const TextStyle(color: Colors.white70, fontSize: 13)),
+      onTap: () {
+        Navigator.of(context).pop();
+        context.go(route);
+      },
+    );
+  }
+
+  Future<void> _openBiic(BuildContext context) async {
+    Navigator.of(context).pop();
+    final url = (Uri.base.scheme == 'http' || Uri.base.scheme == 'https')
+        ? Uri.base.resolve('/biic/')
+        : Uri.parse('https://neurocitoyenapp.vercel.app/biic/');
+    try {
+      await launchUrl(url, webOnlyWindowName: '_blank');
+    } catch (_) {}
+  }
+
   Future<void> _checkLogin() async {
     final prefs = await SharedPreferences.getInstance();
     prefs.getString('pays_id');
@@ -139,6 +207,7 @@ class _LandingScreenState extends State<LandingScreen> {
           child: Container(height: 1, color: _C.or.withOpacity(0.35)),
         ),
       ),
+      drawer: _buildDrawer(context),
       bottomNavigationBar: Container(
         decoration: BoxDecoration(
           color: _C.nuit,
