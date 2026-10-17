@@ -11,6 +11,7 @@ import 'admin_users_tab.dart';
 import 'admin_journal_tab.dart';
 import 'admin_universite_tab.dart';
 import 'admin_cooperatives_tab.dart';
+import 'admin_theme_tab.dart';
 
 class _C {
   static const nuit = Color(0xFF060A1F);
@@ -52,7 +53,7 @@ class _AdminSuperScreenState extends State<AdminSuperScreen>
   void initState() {
     super.initState();
     // 8 onglets
-    _tabCtrl = TabController(length: 9, vsync: this);
+    _tabCtrl = TabController(length: 10, vsync: this);
     _load();
   }
 
@@ -195,6 +196,7 @@ class _AdminSuperScreenState extends State<AdminSuperScreen>
             Tab(icon: Icon(Icons.tune, size: 18), text: 'Prix & Config'),
             Tab(icon: Icon(Icons.people, size: 18), text: 'Utilisateurs'),
             Tab(icon: Icon(Icons.history, size: 18), text: 'Journal'),
+            Tab(icon: Icon(Icons.palette, size: 18), text: 'Apparence'),
           ],
         ),
       ),
@@ -210,6 +212,7 @@ class _AdminSuperScreenState extends State<AdminSuperScreen>
           const AdminPrixTab(),
           const AdminUsersTab(),
           const AdminJournalTab(),
+          const AdminThemeTab(),
         ],
       ),
     );

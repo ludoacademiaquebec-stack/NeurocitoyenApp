@@ -4,6 +4,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:flutter_web_plugins/url_strategy.dart';
 
 import 'app.dart';
+import 'core/app_theme_service.dart';
 import 'core/supabase_config.dart';
 
 Future<void> main() async {
@@ -35,6 +36,7 @@ Future<void> main() async {
     return;
   }
 
+  await AppThemeService.instance.load();
   runApp(const App());
 }
 
