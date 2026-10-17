@@ -205,7 +205,7 @@ class _AdminSuperScreenState extends State<AdminSuperScreen>
           const AdminInstitutionsTab(),
           const AdminEcoTab(),
           const AdminUniversiteTab(),
-          const AdminCooperativesTab(),
+          AdminCooperativesTab(),
           const AdminPrixTab(),
           const AdminUsersTab(),
           const AdminJournalTab(),
