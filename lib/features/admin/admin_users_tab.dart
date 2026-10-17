@@ -115,7 +115,7 @@ class _AdminUsersTabState extends State<AdminUsersTab> {
   // ===========================================================================
   Widget _header() {
     final total = _users.length;
-    final admins = _users.where((u) => u['role_systeme'] == 'superadmin').length;
+    final admins = _users.where((u) => u['role_systeme'] == 'super_admin').length;
 
     return Container(
       padding: const EdgeInsets.all(16),
@@ -189,7 +189,7 @@ class _AdminUsersTabState extends State<AdminUsersTab> {
               children: [
                 _chipRole('tous', 'Tous'),
                 _chipRole('membre', 'Membres'),
-                _chipRole('superadmin', 'SuperAdmins'),
+                _chipRole('super_admin', 'SuperAdmins'),
               ],
             ),
           ),
@@ -244,7 +244,7 @@ class _AdminUsersTabState extends State<AdminUsersTab> {
   }
 
   Widget _userCard(Map<String, dynamic> u) {
-    final isAdmin = u['role_systeme'] == 'superadmin';
+    final isAdmin = u['role_systeme'] == 'super_admin';
     final pseudo = u['pseudo'] ?? '—';
     final nomComplet = '${u['prenoms'] ?? ''} ${u['nom'] ?? ''}'.trim();
     final email = u['email'] ?? '—';

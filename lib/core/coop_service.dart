@@ -16,23 +16,115 @@ class CoopService {
   }
 
   // ===========================================================================
-  // VÉRIFIER SI L'UTILISATEUR EST CERTIFIÉ (étape 7 validée)
+  // VÉRIFIER SI L'UTILISATEUR EST CERTIFIÉ NEUROCITOYEN (étapes 1, 2, 3)
   // ===========================================================================
-  static Future<bool> isCertifie(String userId) async {
+  static Future<bool> isNeurocitoyenCertifie(String userId) async {
     try {
       final res = await _db
           .from('user_progress')
           .select('etape_numero, statut')
           .eq('user_id', userId)
-          .eq('etape_numero', 7)
-          .maybeSingle();
+          .inFilter('etape_numero', [1, 2, 3]);
 
-      if (res == null) return false;
-      final statut = res['statut'] as String?;
-      return statut == 'termine' || statut == 'certifie' || statut == 'valide';
+      if (res.length < 3) return false;
+
+      const statutsValides = ['termine', 'certifie', 'valide'];
+      for (final row in res) {
+        final s = row['statut'] as String?;
+        if (s == null || !statutsValides.contains(s)) return false;
+      }
+      return true;
     } catch (_) {
       return false;
     }
+  }
+
+  // ===========================================================================
+  // VÉRIFIER SI L'UTILISATEUR A VALIDÉ L'EEC (12 modules, note >= 85%)
+  // ===========================================================================
+  static Future<Map<String, dynamic>> verifierEEC(String userId) async {
+    try {
+      // 1. Récupérer les 12 modules de la formation EEC
+      final modulesEec = await _db
+          .from('formation_modules')
+          .select('module_id, note_minimum, ordre')
+          .eq('formation_id', '11111111-1111-1111-1111-111111111111')
+          .order('ordre');
+
+      if (modulesEec.isEmpty) {
+        return {'ok': false, 'valides': 0, 'total': 0, 'modules': []};
+      }
+
+      final moduleIds = modulesEec.map((m) => m['module_id'] as String).toList();
+      final notesMin = <String, int>{};
+      for (final m in modulesEec) {
+        notesMin[m['module_id'] as String] = (m['note_minimum'] as int?) ?? 85;
+      }
+
+      // 2. Récupérer la progression de l'utilisateur
+      final prog = await _db
+          .from('user_formation_progress')
+          .select('module_id, statut, score_obtenu')
+          .eq('user_id', userId)
+          .inFilter('module_id', moduleIds);
+
+      // 3. Compter les modules valides
+      int valides = 0;
+      final details = <Map<String, dynamic>>[];
+      for (final m in modulesEec) {
+        final moduleId = m['module_id'] as String;
+        final noteMin = (m['note_minimum'] as int?) ?? 85;
+        final p = prog.firstWhere(
+          (x) => x['module_id'] == moduleId,
+          orElse: () => <String, dynamic>{},
+        );
+        final statut = p['statut'] as String?;
+        final score = p['score_obtenu'] as int?;
+        final ok = statut == 'termine' && score != null && score >= noteMin;
+        if (ok) valides++;
+        details.add({
+          'module_id': moduleId,
+          'note_minimum': noteMin,
+          'score': score,
+          'statut': statut,
+          'valide': ok,
+        });
+      }
+
+      return {
+        'ok': valides == modulesEec.length,
+        'valides': valides,
+        'total': modulesEec.length,
+        'modules': details,
+      };
+    } catch (_) {
+      return {'ok': false, 'valides': 0, 'total': 0, 'modules': []};
+    }
+  }
+
+  // ===========================================================================
+  // VÉRIFIER SI L'UTILISATEUR EST CERTIFIÉ (Neurocitoyen + EEC)
+  // ===========================================================================
+  static Future<bool> isCertifie(String userId) async {
+    final neuro = await isNeurocitoyenCertifie(userId);
+    if (!neuro) return false;
+    final eec = await verifierEEC(userId);
+    return eec['ok'] == true;
+  }
+
+  // ===========================================================================
+  // STATUT COMPLET DE CERTIFICATION (pour l'UI)
+  // ===========================================================================
+  static Future<Map<String, dynamic>> getStatutCertification(String userId) async {
+    final neuro = await isNeurocitoyenCertifie(userId);
+    final eec = await verifierEEC(userId);
+    return {
+      'neurocitoyen': neuro,
+      'eec': eec['ok'],
+      'eec_valides': eec['valides'],
+      'eec_total': eec['total'],
+      'certifie': neuro && (eec['ok'] == true),
+    };
   }
 
   // ===========================================================================

@@ -34,7 +34,7 @@ class CoopScreen extends StatefulWidget {
 class _CoopScreenState extends State<CoopScreen> {
   bool _loading = true;
   String? _userId;
-  bool _certifie = false;
+  Map<String, dynamic> _statut = {};
   List<Map<String, dynamic>> _mesCoops = [];
   List<Map<String, dynamic>> _projetsOuverts = [];
   String? _monQuartierId;
@@ -57,7 +57,7 @@ class _CoopScreenState extends State<CoopScreen> {
         return;
       }
 
-      _certifie = await CoopService.isCertifie(_userId!);
+      _statut = await CoopService.getStatutCertification(_userId!);
       _mesCoops = await CoopService.mesCooperatives(_userId!);
 
       if (_mesCoops.isNotEmpty) {
@@ -94,7 +94,7 @@ class _CoopScreenState extends State<CoopScreen> {
 
   Widget _buildBody() {
     if (_userId == null) return _nonConnecte();
-    if (!_certifie) return _nonCertifie();
+    if (_statut['certifie'] != true) return _nonCertifie();
     if (_coopActive != null) return _dashboard();
     return _pasDeCoop();
   }
@@ -126,23 +126,113 @@ class _CoopScreenState extends State<CoopScreen> {
   // ÉTAT 2 : NON CERTIFIÉ
   // ===========================================================================
   Widget _nonCertifie() {
+    final neuro = _statut['neurocitoyen'] == true;
+    final eecOk = _statut['eec'] == true;
+    final eecValides = _statut['eec_valides'] ?? 0;
+    final eecTotal = _statut['eec_total'] ?? 0;
+
     return ListView(
       padding: const EdgeInsets.all(16),
       children: [
-        _cardInfo(
-          icon: Icons.school_outlined,
-          titre: 'Devenir Neurocitoyen certifié',
-          message:
-              'Pour fonder ou rejoindre une coopérative, tu dois d\'abord valider '
-              'les 7 étapes du parcours, notamment l\'étape 7 (Adhésion & part sociale).',
-          bouton: FilledButton(
-            style: FilledButton.styleFrom(backgroundColor: _C.or),
-            onPressed: () => context.go('/mon-cheminement'),
-            child: const Text('Voir mon parcours',
-                style: TextStyle(color: Colors.black)),
+        Container(
+          padding: const EdgeInsets.all(20),
+          decoration: BoxDecoration(
+            color: _C.nuit3,
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: _C.or.withValues(alpha: 0.4)),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  const Icon(Icons.info_outline, color: _C.or, size: 22),
+                  const SizedBox(width: 8),
+                  Text('2 conditions pour fonder une coopérative',
+                      style: _serif(15, color: _C.orClair)),
+                ],
+              ),
+              const SizedBox(height: 16),
+              _condTile(
+                icone: neuro ? Icons.check_circle : Icons.radio_button_unchecked,
+                couleur: neuro ? _C.vert : Colors.white38,
+                titre: 'Neurocitoyen certifié',
+                sousTitre: neuro
+                    ? '3 étapes validées'
+                    : 'Valide les 3 étapes du parcours',
+                action: () => context.go('/mon-cheminement'),
+                actionLabel: neuro ? 'Revoir' : 'Commencer',
+              ),
+              const SizedBox(height: 12),
+              _condTile(
+                icone: eecOk ? Icons.check_circle : Icons.timelapse,
+                couleur: eecOk ? _C.vert : _C.or,
+                titre: 'École de l\'Entrepreneuriat Coopératif (EEC)',
+                sousTitre: eecTotal > 0
+                    ? '$eecValides / $eecTotal modules validés (note ≥ 85%)'
+                    : '12 modules à valider',
+                action: () => context.go('/universite'),
+                actionLabel: eecOk ? 'Revoir' : 'Continuer',
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 20),
+        Container(
+          padding: const EdgeInsets.all(14),
+          decoration: BoxDecoration(
+            color: _C.nuit3,
+            borderRadius: BorderRadius.circular(10),
+            border: Border.all(color: Colors.white12),
+          ),
+          child: const Text(
+            'Ces 2 conditions garantissent que tu es prêt à fonder et gérer '
+            'une coopérative viable, dans le respect des valeurs neurocitoyennes.',
+            style: TextStyle(color: Colors.white70, fontSize: 12, height: 1.5),
           ),
         ),
       ],
+    );
+  }
+
+  Widget _condTile({
+    required IconData icone,
+    required Color couleur,
+    required String titre,
+    required String sousTitre,
+    required VoidCallback action,
+    required String actionLabel,
+  }) {
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: _C.nuit2,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: couleur.withValues(alpha: 0.4)),
+      ),
+      child: Row(
+        children: [
+          Icon(icone, color: couleur, size: 28),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(titre, style: _serif(13, color: _C.orClair)),
+                const SizedBox(height: 2),
+                Text(sousTitre,
+                    style: const TextStyle(
+                        color: Colors.white70, fontSize: 11)),
+              ],
+            ),
+          ),
+          TextButton(
+            onPressed: action,
+            child: Text(actionLabel,
+                style: TextStyle(color: couleur, fontSize: 11, fontWeight: FontWeight.bold)),
+          ),
+        ],
+      ),
     );
   }
 

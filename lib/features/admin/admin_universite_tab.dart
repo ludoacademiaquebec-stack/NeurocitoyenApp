@@ -4,6 +4,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'admin_ecole_detail_screen.dart';
 import 'admin_cursus_detail_screen.dart';
 import 'admin_formation_detail_screen.dart';
+import 'admin_etape_detail_screen.dart';
 
 class _C {
   static const nuit = Color(0xFF060A1F);
@@ -98,8 +99,17 @@ class _AdminUniversiteTabState extends State<AdminUniversiteTab> {
         const SizedBox(height: 10),
         ..._formations.map(_formationCard),
         const SizedBox(height: 24),
-        _sectionTitle('🎯 PARCOURS EN 7 ÉTAPES'),
+        _sectionTitle('🎯 PARCOURS NEUROCITOYEN (${_etapes.length} étapes)'),
         const SizedBox(height: 10),
+        Padding(
+          padding: const EdgeInsets.only(bottom: 8),
+          child: _actionBtn(
+            Icons.add_circle,
+            'Nouvelle étape',
+            _C.vert,
+            () => _openEtape(null),
+          ),
+        ),
         ..._etapes.map(_etapeCard),
         const SizedBox(height: 24),
         _sectionTitle('📹 WEBINAIRES'),
@@ -450,76 +460,161 @@ class _AdminUniversiteTabState extends State<AdminUniversiteTab> {
   // ===========================================================================
   Widget _etapeCard(Map<String, dynamic> e) {
     final numero = e['numero'];
-    final prix = e['prix_fcfa'] ?? 0;
+    final gratuit = e['gratuit'] == true;
+    final obligatoire = e['obligatoire'] == true;
 
+    return InkWell(
+      onTap: () => _openEtape(e),
+      borderRadius: BorderRadius.circular(8),
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 6),
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: _C.nuit2,
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(color: _C.vert.withOpacity(0.3)),
+        ),
+        child: Row(
+          children: [
+            Container(
+              width: 32,
+              height: 32,
+              decoration:
+                  const BoxDecoration(color: _C.vert, shape: BoxShape.circle),
+              child: Center(
+                child: Text('$numero',
+                    style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 14,
+                        fontWeight: FontWeight.w900)),
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('${e['titre']}',
+                      style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 13,
+                          fontWeight: FontWeight.w700)),
+                  if (e['sous_titre'] != null && '${e['sous_titre']}'.isNotEmpty)
+                    Text('${e['sous_titre']}',
+                        style: const TextStyle(
+                            color: Colors.white54, fontSize: 11)),
+                  const SizedBox(height: 4),
+                  Row(
+                    children: [
+                      _chipBadge(
+                        gratuit ? 'GRATUIT' : 'PAYANT',
+                        gratuit ? _C.vert : _C.or,
+                      ),
+                      const SizedBox(width: 6),
+                      if (obligatoire) _chipBadge('OBLIGATOIRE', _C.violet),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+            const Icon(Icons.chevron_right, color: _C.or, size: 20),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _chipBadge(String text, Color color) {
     return Container(
-      margin: const EdgeInsets.only(bottom: 6),
-      padding: const EdgeInsets.all(12),
+      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.15),
+        borderRadius: BorderRadius.circular(4),
+        border: Border.all(color: color.withValues(alpha: 0.4)),
+      ),
+      child: Text(text,
+          style: TextStyle(
+              color: color, fontSize: 9, fontWeight: FontWeight.w900)),
+    );
+  }
+
+  // ===========================================================================
+  // WIDGETS UTILITAIRES
+  // ===========================================================================
+  Widget _actionBtn(
+      IconData icon, String label, Color color, VoidCallback onTap) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(6),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+        decoration: BoxDecoration(
+          color: color.withValues(alpha: 0.12),
+          borderRadius: BorderRadius.circular(6),
+          border: Border.all(color: color.withValues(alpha: 0.4)),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(icon, color: color, size: 13),
+            const SizedBox(width: 4),
+            Text(
+              label,
+              style: TextStyle(
+                color: color,
+                fontSize: 10,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _emptyCard(String text, IconData icon) {
+    return Container(
+      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: _C.nuit2,
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: _C.vert.withOpacity(0.3)),
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: Colors.white12),
       ),
       child: Row(
         children: [
-          Container(
-            width: 32,
-            height: 32,
-            decoration:
-                const BoxDecoration(color: _C.vert, shape: BoxShape.circle),
-            child: Center(
-              child: Text('$numero',
-                  style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 14,
-                      fontWeight: FontWeight.w900)),
-            ),
-          ),
+          Icon(icon, color: Colors.white38, size: 24),
           const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text('${e['titre']}',
-                    style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 13,
-                        fontWeight: FontWeight.w700)),
-                if (e['sous_titre'] != null)
-                  Text('${e['sous_titre']}',
-                      style: const TextStyle(
-                          color: Colors.white54, fontSize: 11)),
-              ],
-            ),
-          ),
-          Text(prix == 0 ? 'GRATUIT' : '$prix F',
-              style: TextStyle(
-                  color: prix == 0 ? _C.vert : _C.orClair,
-                  fontSize: 11,
-                  fontWeight: FontWeight.bold)),
+          Text(text,
+              style: const TextStyle(color: Colors.white54, fontSize: 13)),
         ],
       ),
     );
   }
 
-  // ===========================================================================
-  // CARTE WEBINAIRE
-  // ===========================================================================
   Widget _webinaireCard(Map<String, dynamic> w) {
     final dateStr = w['date_debut']?.toString() ?? '';
     final date = dateStr.length >= 10 ? dateStr.substring(0, 10) : dateStr;
+    final heure = dateStr.length >= 16 ? dateStr.substring(11, 16) : '';
 
     return Container(
       margin: const EdgeInsets.only(bottom: 6),
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: _C.nuit2,
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: _C.rouge.withOpacity(0.3)),
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: _C.rouge.withValues(alpha: 0.3)),
       ),
       child: Row(
         children: [
-          const Icon(Icons.video_call, color: _C.rouge, size: 22),
+          Container(
+            width: 40,
+            height: 40,
+            decoration: BoxDecoration(
+              color: _C.rouge.withValues(alpha: 0.15),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: const Icon(Icons.video_call, color: _C.rouge, size: 20),
+          ),
           const SizedBox(width: 12),
           Expanded(
             child: Column(
@@ -530,32 +625,12 @@ class _AdminUniversiteTabState extends State<AdminUniversiteTab> {
                         color: Colors.white,
                         fontSize: 13,
                         fontWeight: FontWeight.w700)),
-                Text('$date · ${w['formateur'] ?? '—'}',
+                Text('$date · $heure · ${w['formateur'] ?? '—'}',
                     style: const TextStyle(
                         color: Colors.white54, fontSize: 10)),
               ],
             ),
           ),
-        ],
-      ),
-    );
-  }
-
-  Widget _emptyCard(String text, IconData icon) {
-    return Container(
-      padding: const EdgeInsets.all(24),
-      decoration: BoxDecoration(
-        color: _C.nuit2,
-        borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: Colors.white12),
-      ),
-      child: Row(
-        children: [
-          Icon(icon, color: Colors.white38, size: 28),
-          const SizedBox(width: 12),
-          Text(text,
-              style:
-                  const TextStyle(color: Colors.white54, fontSize: 13)),
         ],
       ),
     );
@@ -589,6 +664,16 @@ class _AdminUniversiteTabState extends State<AdminUniversiteTab> {
         .push(
           MaterialPageRoute(
             builder: (_) => AdminFormationDetailScreen(formation: f),
+          ),
+        )
+        .then((_) => _load());
+  }
+
+  void _openEtape(Map<String, dynamic>? e) {
+    Navigator.of(context)
+        .push(
+          MaterialPageRoute(
+            builder: (_) => AdminEtapeDetailScreen(etape: e),
           ),
         )
         .then((_) => _load());
